@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D/3D地形エディタ（データ保存・読み込み機能付き）</title>
+    <title>2D/3D地形エディタ（ローカル＆サーバー読み込み対応）</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
@@ -23,23 +23,26 @@
         h1 { margin: 0 0 10px 0; font-size: 1.2rem; }
         
         .toolbar {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
         }
         .sub-toolbar {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             gap: 8px;
             align-items: center;
             font-size: 0.9rem;
             color: #ccc;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         button, label.btn-label {
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 7px 14px;
+            font-size: 0.85rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -76,9 +79,32 @@
         button#saveBtn { background-color: #fd7e14; font-weight: bold; }
         label#loadLabel { background-color: #17a2b8; font-weight: bold; cursor: pointer; }
 
+        .server-load-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            background: #333;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+        .server-load-box input[type="text"] {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border: 1px solid #555;
+            border-radius: 3px;
+            background: #111;
+            color: #fff;
+            width: 160px;
+        }
+        .server-load-box button {
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            background-color: #17a2b8;
+        }
+
         button#undoBtn { background-color: #6f42c1; }
         button#clearBtn { background-color: #dc3545; }
-        button:disabled, label.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+        button:disabled, label.disabled, input:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
         .canvas-container {
             position: relative;
@@ -100,7 +126,7 @@
         #threeCanvas:active { cursor: grabbing; }
 
         .controls {
-            margin-top: 20px;
+            margin-top: 15px;
             font-size: 0.9rem;
             color: #ccc;
             text-align: center;
@@ -115,6 +141,7 @@
 
     <h1>地形・道路・川・家 メッシュ エディタ</h1>
 
+    <!-- メインツールバー -->
     <div class="toolbar">
         <button id="raiseBtn" class="active" onclick="setMode('raise')">丘を盛る</button>
         <button id="roadBtn" onclick="setMode('road')">道路を敷く</button>
@@ -123,19 +150,30 @@
         <button id="eraseBtn" onclick="setMode('erase')">一部消しゴム</button>
         <button id="undoBtn" onclick="undo()">1手戻る</button>
         <button id="clearBtn" onclick="clearAll()">全消し</button>
+    </div>
+
+    <!-- データ入出力ツールバー -->
+    <div class="sub-toolbar">
+        <button id="saveBtn" onclick="saveToFile()">保存 (JSON)</button>
         
-        <!-- 保存・読み込みボタン -->
-        <button id="saveBtn" onclick="saveToFile()">データを保存</button>
+        <!-- ① ローカルファイル選択 -->
         <label id="loadLabel" class="btn-label">
-            データを読み込み
+            ローカルから読み込み
             <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)" style="display: none;">
         </label>
 
+        <!-- ② サーバー/URL指定読み込み -->
+        <div class="server-load-box">
+            <input type="text" id="serverUrlInput" placeholder="URLまたはパス (.json)" value="./terrain_data.json">
+            <button id="serverLoadBtn" onclick="loadFromUrl()">サーバー読み込み</button>
+        </div>
+
         <button id="viewBtn" onclick="toggleViewMode()">3D表示に切り替え</button>
         <button id="colorToggleBtn" onclick="toggleElevationColor()">標高の色分け: OFF</button>
-        <button id="contourToggleBtn" onclick="toggleContourLine()">等高線の表示: OFF</button>
+        <button id="contourToggleBtn" onclick="toggleContourLine()">等高線: OFF</button>
     </div>
 
+    <!-- 筆サイズ表示エリア -->
     <div class="sub-toolbar" id="brushSizeArea">
         <span>筆の太さ：</span>
         <button id="sizeMinBtn" class="size-btn active" onclick="setBrushSize('min')">極細（直径1マス）</button>
@@ -195,6 +233,21 @@ let roadSegments = [];
 let riverSegments = [];
 let houseGroups = []; 
 
+// ★共通データ適用処理
+function applyTerrainData(data) {
+    if (data.heightMap && data.gridSize === GRID_SIZE) {
+        saveHistory();
+        heightMap = data.heightMap;
+        roadMap = data.roadMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+        riverMap = data.riverMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+        houseMap = data.houseMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+        
+        if (viewMode === '2D') draw2D(); else sync2DTo3D();
+        return true;
+    }
+    return false;
+}
+
 // ★ファイル保存機能
 function saveToFile() {
     const data = {
@@ -218,7 +271,7 @@ function saveToFile() {
     URL.revokeObjectURL(url);
 }
 
-// ★ファイル読み込み機能
+// ★① ローカルファイルからの読み込み
 function loadFromFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -227,24 +280,41 @@ function loadFromFile(event) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            if (data.heightMap && data.gridSize === GRID_SIZE) {
-                saveHistory();
-                heightMap = data.heightMap;
-                roadMap = data.roadMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-                riverMap = data.riverMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-                houseMap = data.houseMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-                
-                if (viewMode === '2D') draw2D(); else sync2DTo3D();
-                alert('地形データを読み込みました。');
+            if (applyTerrainData(data)) {
+                alert('ローカルから地形データを読み込みました。');
             } else {
                 alert('読み込んだファイルの形式またはグリッドサイズが一致しません。');
             }
         } catch (err) {
-            alert('ファイルの読み込みに失敗しました。');
+            alert('ファイルの解析に失敗しました。');
         }
     };
     reader.readAsText(file);
-    event.target.value = ''; // 入力をリセット
+    event.target.value = ''; 
+}
+
+// ★② サーバー / URLからの読み込み
+async function loadFromUrl() {
+    const url = document.getElementById('serverUrlInput').value.trim();
+    if (!url) {
+        alert('URLを入力してください。');
+        return;
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTPエラー Status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (applyTerrainData(data)) {
+            alert('サーバーから地形データを読み込みました。');
+        } else {
+            alert('取得したデータの形式またはグリッドサイズが一致しません。');
+        }
+    } catch (err) {
+        alert(`サーバーからの読み込みに失敗しました。\n詳細: ${err.message}`);
+    }
 }
 
 function saveHistory() {
@@ -480,17 +550,17 @@ function toggleContourLine() {
     if (viewMode === '3D') {
         showContour3D = !showContour3D;
         if (showContour3D) {
-            btn.innerText = '等高線の表示: ON'; btn.classList.add('active');
+            btn.innerText = '等高線: ON'; btn.classList.add('active');
         } else {
-            btn.innerText = '等高線の表示: OFF'; btn.classList.remove('active');
+            btn.innerText = '等高線: OFF'; btn.classList.remove('active');
         }
         sync2DTo3D();
     } else {
         showContour2D = !showContour2D;
         if (showContour2D) {
-            btn.innerText = '等高線の表示: ON'; btn.classList.add('active');
+            btn.innerText = '等高線: ON'; btn.classList.add('active');
         } else {
-            btn.innerText = '等高線の表示: OFF'; btn.classList.remove('active');
+            btn.innerText = '等高線: OFF'; btn.classList.remove('active');
         }
         draw2D();
     }
@@ -525,6 +595,8 @@ function toggleViewMode() {
     const toggleBtn = document.getElementById('colorToggleBtn');
     const contourBtn = document.getElementById('contourToggleBtn'); 
     const loadLabel = document.getElementById('loadLabel');
+    const serverBtn = document.getElementById('serverLoadBtn');
+    const urlInput = document.getElementById('serverUrlInput');
     const guide = document.getElementById('guideText');
     
     if (viewMode === '2D') {
@@ -532,7 +604,7 @@ function toggleViewMode() {
         btn.innerText = '2Dエディタに戻る';
         toggleBtn.style.display = 'inline-block';
         
-        contourBtn.innerText = showContour3D ? '等高線の表示: ON' : '等高線の表示: OFF';
+        contourBtn.innerText = showContour3D ? '等高線: ON' : '等高線: OFF';
         contourBtn.classList.toggle('active', showContour3D);
         
         canvas2d.style.display = 'none'; canvas3d.style.display = 'block';
@@ -543,6 +615,8 @@ function toggleViewMode() {
             document.getElementById(id).disabled = true;
         });
         loadLabel.classList.add('disabled');
+        serverBtn.disabled = true;
+        urlInput.disabled = true;
 
         sync2DTo3D();
         resetCameraPosition(); 
@@ -554,7 +628,7 @@ function toggleViewMode() {
         btn.innerText = '3D表示に切り替え';
         toggleBtn.style.display = 'none';
         
-        contourBtn.innerText = showContour2D ? '等高線の表示: ON' : '等高線の表示: OFF';
+        contourBtn.innerText = showContour2D ? '等高線: ON' : '等高線: OFF';
         contourBtn.classList.toggle('active', showContour2D);
         
         canvas2d.style.display = 'block'; canvas3d.style.display = 'none';
@@ -565,6 +639,8 @@ function toggleViewMode() {
             document.getElementById(id).disabled = false;
         });
         loadLabel.classList.remove('disabled');
+        serverBtn.disabled = false;
+        urlInput.disabled = false;
         draw2D();
     }
 }
