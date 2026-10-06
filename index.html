@@ -3,117 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D/3D地形エディタ（ローカル＆サーバー読み込み対応）</title>
+    <title>TerrainStudio - 2D/3D地形エディタ</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        body {
+        :root {
+            --bg-dark: #0f1319;
+            --bg-panel: #171d25;
+            --bg-hover: #232b37;
+            --primary: #28a745;
+            --primary-hover: #218838;
+            --accent: #007bff;
+            --text-main: #e1e6ed;
+            --text-muted: #8a99ad;
+            --border: #2a3443;
+            --tutorial-width: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #222;
-            color: #fff;
-            font-family: sans-serif;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            padding-top: 20px;
-            box-sizing: border-box;
+            overflow: hidden;
         }
-        h1 { margin: 0 0 10px 0; font-size: 1.2rem; }
-        
-        .toolbar {
-            margin-bottom: 8px;
+
+        /* Top Header Bar */
+        .top-header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: 44px;
+            z-index: 100;
+            flex-shrink: 0;
         }
-        .sub-toolbar {
-            margin-bottom: 12px;
+
+        .header-left {
             display: flex;
-            gap: 8px;
             align-items: center;
-            font-size: 0.9rem;
-            color: #ccc;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 20px;
         }
-        button, label.btn-label {
-            padding: 7px 14px;
-            font-size: 0.85rem;
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: #20c997;
+        }
+
+        .brand-logo svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Nav Dropdowns */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-btn {
+            background: transparent;
             border: none;
+            color: var(--text-main);
+            padding: 6px 12px;
+            font-size: 0.85rem;
             border-radius: 4px;
             cursor: pointer;
-            background-color: #444;
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             transition: background-color 0.2s;
-            display: inline-block;
         }
-        button.active {
-            background-color: #007bff;
+
+        .dropdown-btn:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .dropdown-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: var(--text-muted);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            min-width: 220px;
+            z-index: 1000;
+            padding: 4px 0;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 8px 16px;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background-color: var(--bg-hover);
+            color: #fff;
+        }
+
+        .menu-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .menu-item.danger:hover {
+            background-color: #dc3545;
+        }
+
+        .menu-header {
+            padding: 6px 16px 2px 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
             font-weight: bold;
         }
-        button#roadBtn.active { background-color: #6c757d; font-weight: bold; }
-        button#riverBtn.active { background-color: #1d63ed; font-weight: bold; }
-        button#houseBtn.active { background-color: #dc3545; font-weight: bold; }
-        
-        button.size-btn {
+
+        .menu-divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: 4px 0;
+        }
+
+        .btn-history {
+            background-color: #1c2533;
+            border: 1px solid var(--border);
+            color: var(--text-main);
             padding: 5px 12px;
             font-size: 0.8rem;
-            background-color: #3a3a3a;
-        }
-        button.size-btn.active {
-            background-color: #e0a800;
-            color: #000;
-            font-weight: bold;
-        }
-        button#viewBtn { background-color: #28a745; font-weight: bold; }
-        button#colorToggleBtn { background-color: #17a2b8; display: none; }
-        button#colorToggleBtn.active { background-color: #e0a800; color: #000; font-weight: bold; }
-        
-        button#contourToggleBtn { background-color: #20c997; display: inline-block; }
-        button#contourToggleBtn.active { background-color: #e0a800; color: #000; font-weight: bold; }
-        
-        button#saveBtn { background-color: #fd7e14; font-weight: bold; }
-        label#loadLabel { background-color: #17a2b8; font-weight: bold; cursor: pointer; }
-
-        .server-load-box {
+            border-radius: 4px;
+            cursor: pointer;
             display: flex;
-            gap: 4px;
             align-items: center;
-            background: #333;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-history:hover:not(:disabled) {
+            background-color: var(--bg-hover);
+            border-color: #4a5a70;
+        }
+
+        .btn-history:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Sub Control Toolbar */
+        .sub-toolbar {
+            background-color: #12171f;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.82rem;
+            height: 42px;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .view-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #18202c;
             padding: 3px 6px;
             border-radius: 4px;
-        }
-        .server-load-box input[type="text"] {
-            padding: 4px 8px;
-            font-size: 0.8rem;
-            border: 1px solid #555;
-            border-radius: 3px;
-            background: #111;
-            color: #fff;
-            width: 160px;
-        }
-        .server-load-box button {
-            padding: 4px 10px;
-            font-size: 0.8rem;
-            background-color: #17a2b8;
+            border: 1px solid var(--border);
         }
 
-        button#undoBtn { background-color: #6f42c1; }
-        button#clearBtn { background-color: #dc3545; }
-        button:disabled, label.disabled, input:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+        .view-toggle-btn {
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+
+        .view-toggle-btn.btn-2d { background-color: #4f46e5; }
+        .view-toggle-btn.btn-2d:hover { background-color: #4338ca; }
+        .view-toggle-btn.btn-3d { background-color: #28a745; }
+        .view-toggle-btn.btn-3d:hover { background-color: #218838; }
+
+        .active-tool-badge {
+            background-color: #1e2836;
+            border: 1px solid #2d3b4e;
+            padding: 3px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #20c997;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #1a222d;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .control-group label {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .control-select {
+            background: #0f1319;
+            color: #ffc107;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .height-input-container {
+            display: flex;
+            align-items: center;
+            background: #0f1319;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 4px;
+        }
+
+        .height-input-container:focus-within { border-color: #20c997; }
+
+        .height-input-field {
+            background: transparent;
+            border: none;
+            color: #20c997;
+            font-weight: bold;
+            font-size: 0.85rem;
+            width: 42px;
+            text-align: right;
+            outline: none;
+            user-select: text;
+        }
+
+        .height-input-field::-webkit-inner-spin-button,
+        .height-input-field::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .height-input-field[type=number] { -moz-appearance: textfield; }
+
+        .height-unit {
+            color: #20c997;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-left: 2px;
+        }
+
+        .slider-val {
+            color: #ffc107;
+            font-weight: bold;
+            min-width: 20px;
+        }
+
+        .btn-step {
+            background: #2a3443;
+            border: none;
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .btn-step:hover { background: #3b485c; }
+
+        /* Main Workspace Layout */
+        .workspace-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #0b0d11;
+            position: relative;
+        }
+
+        .canvas-workspace-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            padding: 10px;
+        }
+
+        .canvas-workspace {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+        }
+
+        .canvas-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #subCard { display: none; }
+
+        .card-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         .canvas-container {
             position: relative;
-            width: 480px;  
-            height: 480px;
-            border: 4px solid #282828;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            width: 440px;
+            height: 440px;
+            border: 2px solid #232d3b;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             background-color: #1a1a1a;
+            overflow: hidden;
         }
+
+        /* 3D Operation Hint */
+        .controls-hint-3d {
+            visibility: hidden;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background-color: #151a21;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 4px;
+            text-align: left;
+            white-space: nowrap;
+            width: 440px;
+            box-sizing: border-box;
+        }
+
+        .controls-hint-3d.visible { visibility: visible; }
+
+        /* Legend Bar */
+        .legend-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin-left: 10px;
+            height: 440px;
+            background-color: #151a21;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 6px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .legend-container.dummy-legend {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .legend-bar-wrapper {
+            position: relative;
+            width: 22px;
+            height: 432px;
+            border: 1px solid #444;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .legend-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .legend-pointer {
+            position: absolute;
+            left: -3px;
+            width: 28px;
+            height: 3px;
+            background-color: #fff;
+            border: 1px solid #000;
+            box-shadow: 0 0 4px #fff;
+            pointer-events: none;
+            transform: translateY(-50%);
+            transition: top 0.05s ease-out;
+        }
+
+        .legend-labels {
+            position: relative;
+            width: 38px;
+            height: 432px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-left: 6px;
+            pointer-events: none;
+        }
+
+        .legend-label-item {
+            position: absolute;
+            transform: translateY(-50%);
+            white-space: nowrap;
+        }
+
         canvas {
             position: absolute;
             top: 0;
@@ -121,141 +485,1053 @@
             width: 100%;
             height: 100%;
         }
-        #terrainCanvas { z-index: 2; cursor: crosshair; }
-        #threeCanvas { z-index: 1; display: none; cursor: grab; }
-        #threeCanvas:active { cursor: grabbing; }
 
-        .controls {
-            margin-top: 15px;
+        .terrainCanvasClass { z-index: 2; cursor: crosshair; }
+        .threeCanvasClass { z-index: 1; display: none; cursor: grab; }
+        .threeCanvasClass:active { cursor: grabbing; }
+
+        /* Right Side Tutorial Sidebar */
+        .tutorial-sidebar {
+            width: var(--tutorial-width);
+            background-color: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            z-index: 10;
+            flex-shrink: 0;
+            transition: margin-right 0.25s ease-in-out;
+        }
+
+        .tutorial-sidebar.hidden {
+            display: none !important;
+        }
+
+        .tutorial-sidebar-header {
+            background: #12171f;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tutorial-sidebar-header h3 {
             font-size: 0.9rem;
-            color: #ccc;
+            color: #20c997;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .close-panel-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-panel-btn:hover {
+            background-color: var(--bg-hover);
+            color: #fff;
+        }
+
+        .help-tabs {
+            display: flex;
+            background: #0f1319;
+            border-bottom: 1px solid var(--border);
+            padding: 0 8px;
+        }
+
+        .help-tab-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
             text-align: center;
-            min-height: 45px;
+        }
+
+        .help-tab-btn.active {
+            color: #20c997;
+            border-bottom-color: #20c997;
+        }
+
+        /* チュートリアル内モード切替タブ */
+        .tutorial-sub-tabs {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: #12171f;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 8px 0 8px;
+        }
+
+        .tutorial-sub-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .tutorial-sub-tab-btn.active {
+            color: #20c997;
+            border-bottom-color: #20c997;
+            background-color: transparent;
+        }
+
+        .tutorial-sub-tab-btn:hover:not(.active) {
+            color: #fff;
+            background-color: var(--bg-hover);
+        }
+
+        .tutorial-content-body {
+            padding: 14px;
+            overflow-y: auto;
+            flex: 1;
+            font-size: 0.8rem;
             line-height: 1.5;
-            width: 90%;
-            max-width: 500px;
+        }
+
+        .help-section-title {
+            color: #20c997;
+            font-size: 0.85rem;
+            margin: 12px 0 6px 0;
+            border-bottom: 1px solid #232d3b;
+            padding-bottom: 4px;
+        }
+
+        .help-section-title:first-child { margin-top: 0; }
+
+        .help-list {
+            margin-left: 16px;
+            margin-bottom: 10px;
+        }
+
+        .help-list li { margin-bottom: 4px; }
+
+        .tutorial-step-card {
+            background: #12171f;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-step-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #ffc107;
+            margin-bottom: 4px;
+            font-size: 0.82rem;
+        }
+
+        .step-number {
+            background: #ffc107;
+            color: #000;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .modal-box h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .modal-box p {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .modal-box input[type=text] {
+            width: 100%;
+            padding: 8px;
+            background: #0f1319;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .modal-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .modal-btn.primary { background: var(--accent); color: #fff; }
+        .modal-btn.cancel { background: #333; color: #ccc; }
+
+        input[type=range] {
+            accent-color: #ffc107;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h1>地形・道路・川・家 メッシュ エディタ</h1>
+    <!-- Top Header Navigation -->
+    <header class="top-header">
+        <div class="header-left">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 0 7 10l-6 8h22L14 6z"/></svg>
+                TerrainStudio
+            </div>
 
-    <!-- メインツールバー -->
-    <div class="toolbar">
-        <button id="raiseBtn" class="active" onclick="setMode('raise')">丘を盛る</button>
-        <button id="roadBtn" onclick="setMode('road')">道路を敷く</button>
-        <button id="riverBtn" onclick="setMode('river')">川を流す</button>
-        <button id="houseBtn" onclick="setMode('house')">家を建てる</button>
-        <button id="eraseBtn" onclick="setMode('erase')">一部消しゴム</button>
-        <button id="undoBtn" onclick="undo()">1手戻る</button>
-        <button id="clearBtn" onclick="clearAll()">全消し</button>
-    </div>
+            <nav class="nav-menu">
+                <div class="dropdown" id="menuTerrain">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuTerrain')">
+                        ✏ 地形作成・編集
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-item" onclick="handleModeSelection('drawContour')">❇ 等高線で作成</div>
+                        <div class="menu-item" id="menuItemBrush" onclick="handleModeSelection('raiseHill')">🖌 ブラシで作成</div>
+                        <div class="menu-item" onclick="handleModeSelection('house')">🏠 家を建てる</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="handleModeSelection('erase')">🧹 一部消しゴム</div>
+                        <div class="menu-item danger" onclick="handleModeSelection('clearAll')">🗑 全消し</div>
+                    </div>
+                </div>
 
-    <!-- データ入出力ツールバー -->
-    <div class="sub-toolbar">
-        <button id="saveBtn" onclick="saveToFile()">保存 (JSON)</button>
-        
-        <!-- ① ローカルファイル選択 -->
-        <label id="loadLabel" class="btn-label">
-            ローカルから読み込み
-            <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)" style="display: none;">
-        </label>
+                <div class="dropdown" id="menuView">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuView')">
+                        👁 表示
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-item" onclick="toggleMainViewModeFromMenu()" id="menuItemMainViewMode">🌐 メイン地形: 3D表示</div>
+                        <div class="menu-item" onclick="toggleSubViewModeFromMenu()" id="menuItemSubViewMode">🌐 サブ地形: 3D表示</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="toggleScreenLayoutFromMenu()" id="menuItemScreenLayout">📱📱 二画面表示</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="toggleContourLine()" id="menuItemContour">等高線: ON</div>
+                        <div class="menu-item" onclick="toggleElevationColor()" id="menuItemColor">標高の色分け: OFF</div>
+                    </div>
+                </div>
 
-        <!-- ② サーバー/URL指定読み込み -->
-        <div class="server-load-box">
-            <input type="text" id="serverUrlInput" placeholder="URLまたはパス (.json)" value="./terrain_data.json">
-            <button id="serverLoadBtn" onclick="loadFromUrl()">サーバー読み込み</button>
+                <div class="dropdown" id="menuFile">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuFile')">
+                        📁 ファイル
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-item" onclick="triggerFileInput()">📂 JSON読み込み</div>
+                        <div class="menu-item" onclick="openServerModal()">🌐 サーバー読み込み</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="saveToFile()">💾 保存 (JSON)</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="copyMainToSub()">📋 メインをサブに複製</div>
+                        <div class="menu-item disabled" id="menuItemSubToMain" onclick="applySubToMain()">🔄 サブをメインに反映</div>
+                    </div>
+                </div>
+
+                <!-- 設定メニュー -->
+                <div class="dropdown" id="menuSettings">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuSettings')">
+                        ⚙ 設定
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-header">🌐 等高線手書き時の影響範囲</div>
+                        <div class="menu-item" onclick="setContourEffectDist(5, 'contourDistNarrow')" id="contourDistNarrow">
+                            <span>狭い (範囲 5セル)</span> <span class="check-mark"></span>
+                        </div>
+                        <div class="menu-item" onclick="setContourEffectDist(10, 'contourDistMedium')" id="contourDistMedium">
+                            <span>標準 (範囲 10セル)</span> <span class="check-mark">✓</span>
+                        </div>
+                        <div class="menu-item" onclick="setContourEffectDist(18, 'contourDistWide')" id="contourDistWide">
+                            <span>広い (範囲 18セル)</span> <span class="check-mark"></span>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-header">🖌 ブラシの高さ変化（盛り上がり度）</div>
+                        <div class="menu-item" onclick="setBrushStep(2, 'brushLevelWeak')" id="brushLevelWeak">
+                            <span>弱 (1回あたり +2m)</span> <span class="check-mark"></span>
+                        </div>
+                        <div class="menu-item" onclick="setBrushStep(5, 'brushLevelMedium')" id="brushLevelMedium">
+                            <span>中 (1回あたり +5m)</span> <span class="check-mark">✓</span>
+                        </div>
+                        <div class="menu-item" onclick="setBrushStep(10, 'brushLevelStrong')" id="brushLevelStrong">
+                            <span>強 (1回あたり +10m)</span> <span class="check-mark"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown" id="menuHelp">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuHelp')">
+                        ❓ ヘルプ
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-item" onclick="openHelpPanel('tutorialTab', 'contour')">📖 チュートリアル</div>
+                        <div class="menu-item" onclick="openHelpPanel('guideTab')">❓ 基本操作ガイド</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" onclick="alert('TerrainStudio v1.0')">ℹ️ バージョン情報 (v1.0)</div>
+                    </div>
+                </div>
+            </nav>
         </div>
 
-        <button id="viewBtn" onclick="toggleViewMode()">3D表示に切り替え</button>
-        <button id="colorToggleBtn" onclick="toggleElevationColor()">標高の色分け: OFF</button>
-        <button id="contourToggleBtn" onclick="toggleContourLine()">等高線: OFF</button>
+        <div class="header-right">
+            <button class="btn-history" onclick="undo()" id="undoBtn" disabled>
+                ⟲ 戻る
+            </button>
+            <button class="btn-history" onclick="redo()" id="redoBtn" disabled>
+                ⟳ 進む
+            </button>
+        </div>
+    </header>
+
+    <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)" style="display: none;">
+
+    <div class="sub-toolbar">
+        <div class="view-btn-group">
+            <button class="view-toggle-btn btn-2d" id="mainViewBtn" onclick="toggleMainViewMode()">
+                🧊 メイン 2D
+            </button>
+            <button class="view-toggle-btn btn-2d" id="subViewBtn" onclick="toggleSubViewMode()" style="display: none;">
+                🧊 サブ 2D
+            </button>
+        </div>
+
+        <div class="active-tool-badge" id="activeToolText">
+            等高線で作成
+        </div>
+
+        <div class="control-group" id="brushSizeGroup" style="display: none;">
+            <label>ブラシサイズ:</label>
+            <input type="range" id="brushSizeSlider" min="1" max="5" value="5" step="1" oninput="changeBrushRadius(this.value)">
+            <span class="slider-val" id="brushSizeVal">5</span>
+        </div>
+
+        <div class="control-group" id="inputHeightGroup">
+            <label>入力標高:</label>
+            <div class="height-input-container">
+                <input type="number" id="selectedHeightInput" class="height-input-field" value="10" min="0" max="100" oninput="handleHeightDirectInput(this.value)" onblur="validateHeightInput(this)">
+                <span class="height-unit">m</span>
+            </div>
+            <button class="btn-step" onclick="stepHeight(-10)">-</button>
+            <button class="btn-step" onclick="stepHeight(10)">+</button>
+        </div>
+
+        <div class="control-group">
+            <label>等高線の間隔:</label>
+            <select class="control-select" id="contourIntervalSelect" onchange="changeContourInterval(this.value)">
+                <option value="1">1m</option>
+                <option value="2">2m</option>
+                <option value="5">5m</option>
+                <option value="10" selected>10m</option>
+            </select>
+        </div>
     </div>
 
-    <!-- 筆サイズ表示エリア -->
-    <div class="sub-toolbar" id="brushSizeArea">
-        <span>筆の太さ：</span>
-        <button id="sizeMinBtn" class="size-btn active" onclick="setBrushSize('min')">極細（直径1マス）</button>
-        <button id="sizeSmallBtn" class="size-btn" onclick="setBrushSize('small')">細い（直径2マス）</button>
-        <button id="sizeLargeBtn" class="size-btn" onclick="setBrushSize('large')">太い（直径5マス）</button>
+    <div class="workspace-container" id="workspaceContainer">
+        <div class="canvas-workspace-wrapper" id="canvasWrapper">
+            <div class="canvas-workspace" id="canvasWorkspace">
+                <div class="canvas-card" id="mainCard">
+                    <div class="card-title">【メイン地形】</div>
+                    <div style="display: flex; align-items: flex-start;">
+                        <div class="canvas-container">
+                            <canvas id="terrainCanvasMain" class="terrainCanvasClass"></canvas>
+                            <canvas id="threeCanvasMain" class="threeCanvasClass"></canvas>
+                        </div>
+                        <div class="legend-container" id="legendMain" title="タップまたはドラッグして描画標高を選択">
+                            <div class="legend-bar-wrapper">
+                                <canvas id="legendCanvasMain" class="legend-canvas" width="22" height="432"></canvas>
+                                <div class="legend-pointer" id="legendPointer"></div>
+                            </div>
+                            <div class="legend-labels" id="legendLabelsMain"></div>
+                        </div>
+                    </div>
+                    <div class="controls-hint-3d" id="hintMain3D">
+                        【3D操作】 ドラッグ: 回転 / ホイール: ズーム / 右クリックドラッグ: 並行移動
+                    </div>
+                </div>
+
+                <div class="canvas-card" id="subCard">
+                    <div class="card-title">【サブ地形】(読み込み用)</div>
+                    <div style="display: flex; align-items: flex-start;">
+                        <div class="canvas-container">
+                            <canvas id="terrainCanvasSub" class="terrainCanvasClass"></canvas>
+                            <canvas id="threeCanvasSub" class="threeCanvasClass"></canvas>
+                        </div>
+                        <div class="legend-container dummy-legend">
+                            <div class="legend-bar-wrapper">
+                                <div class="legend-canvas"></div>
+                            </div>
+                            <div class="legend-labels"></div>
+                        </div>
+                    </div>
+                    <div class="controls-hint-3d" id="hintSub3D">
+                        【3D操作】 ドラッグ: 回転 / ホイール: ズーム / 右クリックドラッグ: 並行移動
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <aside class="tutorial-sidebar" id="helpPanel">
+            <div class="tutorial-sidebar-header">
+                <h3>📖 チュートリアル＆ガイド</h3>
+                <button class="close-panel-btn" onclick="closeHelpPanel()" title="ヘルプパネルを閉じる">✕</button>
+            </div>
+            <div class="help-tabs">
+                <button class="help-tab-btn active" id="tabBtnTutorial" onclick="switchHelpTab('tutorialTab')">チュートリアル</button>
+                <button class="help-tab-btn" id="tabBtnGuide" onclick="switchHelpTab('guideTab')">基本操作ガイド</button>
+            </div>
+
+            <!-- チュートリアル用のモード切り替えサブタブ -->
+            <div class="tutorial-sub-tabs" id="tutorialSubTabs">
+                <button class="tutorial-sub-tab-btn active" id="subTabBtnContour" onclick="switchTutorialType('contour')">
+                    ✳ 等高線による入力
+                </button>
+                <button class="tutorial-sub-tab-btn" id="subTabBtnBrush" onclick="switchTutorialType('brush')">
+                    🖌 ブラシによる入力
+                </button>
+            </div>
+
+            <div class="tutorial-content-body">
+                <div id="tutorialTab">
+                    <!-- 等高線チュートリアル -->
+                    <div id="tutorialContour">
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">1</span>
+                                <span>山の裾野（すそ野）を作る</span>
+                            </div>
+                            <p>1. ツールバーの「入力標高」を <strong>10m</strong> に設定します。<br>
+                               2. モードを「❇ 等高線で作成」にし、キャンバス中央付近に大きめの円を描くようにくるっと線を繋げて閉じます。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">2</span>
+                                <span>段々にして標高を上げる</span>
+                            </div>
+                            <p>1. 「入力標高」を <strong>30m</strong> に変更します。<br>
+                               2. 先ほど描いた10mの円の内側に、一まわり小さな円を描いて閉じます。<br>
+                               3. 同様に「入力標高」を <strong>60m</strong> にし、さらに内側に小さな円を描いて山頂を作ります。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">3</span>
+                                <span>家を建てる</span>
+                            </div>
+                            <p>1. メニュー「地形作成・編集」から「🏠 家を建てる」を選択します。<br>
+                               2. 山の麓（標高10m〜30mのエリア）をクリックして、家を数軒配置します。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">4</span>
+                                <span>3Dで作品を確認する！</span>
+                            </div>
+                            <p>1. ツールバーの <strong>「🧊 メイン 2D」</strong> ボタンを押して <strong>「🌐 メイン 3D」</strong> に切り替えます。<br>
+                               2. マウスドラッグでぐるぐる回して、完成した立体的な山と家を鑑賞しましょう！</p>
+                        </div>
+                    </div>
+
+                    <!-- ブラシチュートリアル -->
+                    <div id="tutorialBrush" style="display: none;">
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">1</span>
+                                <span>ブラシモードを選択する</span>
+                            </div>
+                            <p>1. メニュー「地形作成・編集」から「🖌 ブラシで作成」を選択します。<br>
+                               2. ツールバーで「ブラシサイズ」を好みの大きさに調整します。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">2</span>
+                                <span>ドラッグして山を盛り上げる</span>
+                            </div>
+                            <p>1. キャンバス上をマウスでなぞると、なぞった部分の標高が上がります。<br>
+                               2. 同じ場所を何度も繰り返しドラッグすることで、高く隆起した山を作ることができます。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">3</span>
+                                <span>家を建てる</span>
+                            </div>
+                            <p>1. メニュー「地形作成・編集」から「🏠 家を建てる」を選択します。<br>
+                               2. 盛り上げた山の麓や平らな場所をクリックして、家を数軒配置します。</p>
+                        </div>
+
+                        <div class="tutorial-step-card">
+                            <div class="tutorial-step-header">
+                                <span class="step-number">4</span>
+                                <span>3Dで形状を確認する</span>
+                            </div>
+                            <p>1. ツールバーの <strong>「🧊 メイン 2D」</strong> ボタンを押して <strong>「🌐 メイン 3D」</strong> に切り替えます。<br>
+                               2. 盛り上げた地形の滑らかさや立体感を周囲から確認します。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="guideTab" style="display: none;">
+                    <div class="help-section-title">✏ 地形作成・編集機能</div>
+                    <ul class="help-list">
+                        <li><strong>❇ 等高線で作成:</strong> ドラッグして線を引きます。始点と終点を繋いで輪を閉じると、その標高を境界条件として内側・外側が滑らかに補間されます。</li>
+                        <li><strong>🖌 ブラシで作成:</strong> なぞった箇所の高さを盛り上げます。（2Dのみ）</li>
+                        <li><strong>🏠 家を建てる:</strong> クリックすると家を設置できます。</li>
+                        <li><strong>🧹 一部消しゴム:</strong> なぞった箇所の高さを徐々に削り、家も消去します。</li>
+                    </ul>
+
+                    <div class="help-section-title">📊 標高の設定 & カラー凡例</div>
+                    <ul class="help-list">
+                        <li><strong>入力標高:</strong> 0m〜100mの範囲で変更できます。</li>
+                        <li><strong>カラー凡例:</strong> 右側の色バーのドラッグやクリックで標高を選択可能です。</li>
+                    </ul>
+
+                    <div class="help-section-title">🌐 3D表示 & 操作</div>
+                    <ul class="help-list">
+                        <li><strong>3Dモード切替:</strong> 「メイン 2D」ボタンで立体表示に切り替えます。</li>
+                        <li><strong>視点移動:</strong> 左ドラッグで回転、ホイールでズーム、右ドラッグで平行移動。</li>
+                    </ul>
+
+                    <div class="help-section-title">📱📱 二画面 & ファイル</div>
+                    <ul class="help-list">
+                        <li><strong>二画面表示:</strong> メインとサブの比較や複製を行えます。</li>
+                        <li><strong>保存・読み込み:</strong> JSON形式でデータの保存やロードが可能です。</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
     </div>
 
-    <div class="canvas-container">
-        <canvas id="terrainCanvas"></canvas>
-        <canvas id="threeCanvas"></canvas>
+    <div class="modal-overlay" id="serverModal">
+        <div class="modal-box">
+            <h3>サーバーから読み込み</h3>
+            <input type="text" id="serverUrlInput" value="./terrain_data.json" placeholder="JSON URL">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeServerModal()">キャンセル</button>
+                <button class="modal-btn primary" onclick="loadFromUrl()">読み込み</button>
+            </div>
+        </div>
     </div>
-    
-    <div id="guideText" class="controls">
-        選択中のモードで画面をドラッグしてください。
+
+    <div class="modal-overlay" id="editWarningModal">
+        <div class="modal-box">
+            <h3>編集モードの確認</h3>
+            <p>メイン地形の編集は2D表示で行ってください。</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeEditWarningModal()">キャンセル</button>
+                <button class="modal-btn primary" onclick="confirmSwitchTo2DAndEdit()">2D表示に変える</button>
+            </div>
+        </div>
     </div>
 
 <script>
-// --- 基本設定 ---
 const GRID_SIZE = 40;  
-const CELL_SIZE = 12;  
+const CELL_SIZE = 11;  
 const CANVAS_WIDTH = GRID_SIZE * CELL_SIZE; 
 const CANVAS_HEIGHT = GRID_SIZE * CELL_SIZE; 
+const MAX_HEIGHT = 100;
 
-const canvas2d = document.getElementById('terrainCanvas');
-const ctx = canvas2d.getContext('2d');
-canvas2d.width = CANVAS_WIDTH;
-canvas2d.height = CANVAS_HEIGHT;
+let heightMapMain = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(0));
+let contourConstraintsMain = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(null));
+let houseMapMain = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)); 
 
-const canvas3d = document.getElementById('threeCanvas');
-canvas3d.width = CANVAS_WIDTH;
-canvas3d.height = CANVAS_HEIGHT;
-
-let heightMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(0));
-let roadMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-let riverMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-let houseMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)); 
+let heightMapSub = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(0));
+let houseMapSub = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)); 
+let isSubTerrainLoaded = false; 
 
 let historyStack = [];
+let redoStack = [];
 const MAX_HISTORY = 10; 
 
-let currentBrushRadius = 0.5;  
-const BRUSH_SPEED = 0.6; 
-const ERASE_SPEED = 0.9; 
-const MAX_HEIGHT = 40;   
+let currentSelectedHeight = 10; 
+let currentBrushRadius = 4;
+let brushStep = 5; 
+let contourEffectDist = 10; 
 
 let isDrawing = false;
-let hasChangedThisStroke = false; 
-let currentMode = 'raise'; 
-let viewMode = '2D';       
-let useElevationColor3D = false; 
-let showContour3D = false; 
-let showContour2D = false; 
-let lastPlacedHouseCell = { x: -1, y: -1 }; 
+let lastAppliedCell = { x: -1, y: -1 }; 
+let currentStrokePoints = [];
+let currentMode = 'drawContour'; 
+let pendingMode = null; 
 
-let scene, camera, renderer, terrainMesh, customMaterial, controls;
-let roadSegments = [];
-let riverSegments = [];
-let houseGroups = []; 
+let mainViewMode = '2D'; 
+let subViewMode = '2D';
 
-// ★共通データ適用処理
-function applyTerrainData(data) {
-    if (data.heightMap && data.gridSize === GRID_SIZE) {
-        saveHistory();
-        heightMap = data.heightMap;
-        roadMap = data.roadMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-        riverMap = data.riverMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-        houseMap = data.houseMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+let isDualScreen = false; 
+let useElevationColor = false;
+let showContour3D = true; 
+let showContour2D = true; 
+let contourInterval2D = 10.0;
+
+const canvas2dMain = document.getElementById('terrainCanvasMain');
+const ctxMain = canvas2dMain.getContext('2d');
+canvas2dMain.width = CANVAS_WIDTH; canvas2dMain.height = CANVAS_HEIGHT;
+const canvas3dMain = document.getElementById('threeCanvasMain');
+canvas3dMain.width = CANVAS_WIDTH; canvas3dMain.height = CANVAS_HEIGHT;
+
+const canvas2dSub = document.getElementById('terrainCanvasSub');
+const ctxSub = canvas2dSub.getContext('2d');
+canvas2dSub.width = CANVAS_WIDTH; canvas2dSub.height = CANVAS_HEIGHT;
+const canvas3dSub = document.getElementById('threeCanvasSub');
+canvas3dSub.width = CANVAS_WIDTH; canvas3dSub.height = CANVAS_HEIGHT;
+
+let sceneMain, cameraMain, rendererMain, terrainMeshMain, customMaterialMain, controlsMain;
+let sceneSub, cameraSub, rendererSub, terrainMeshSub, customMaterialSub, controlsSub;
+
+let houseGroupsMain = [];
+let houseGroupsSub = [];
+
+let canvasScaleFactor = 1.0;
+
+function adjustWorkspaceScale() {
+    const wrapper = document.getElementById('canvasWrapper');
+    const workspace = document.getElementById('canvasWorkspace');
+    if (!wrapper || !workspace) return;
+
+    const singleWidth = 520;
+    const targetWidth = isDualScreen ? singleWidth * 2 + 20 : singleWidth;
+    const targetHeight = 500;
+
+    const availWidth = wrapper.clientWidth - 20;
+    const availHeight = wrapper.clientHeight - 20;
+
+    if (availWidth <= 0 || availHeight <= 0) return;
+
+    const scaleX = availWidth / targetWidth;
+    const scaleY = availHeight / targetHeight;
+    
+    let scale = Math.min(scaleX, scaleY);
+    scale = Math.min(1.0, Math.max(0.65, scale));
+
+    canvasScaleFactor = scale;
+    workspace.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', adjustWorkspaceScale);
+
+function toggleDropdown(id) {
+    const target = document.getElementById(id);
+    const wasActive = target.classList.contains('active');
+    closeAllDropdowns();
+    if (!wasActive) target.classList.add('active');
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+}
+
+window.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) closeAllDropdowns();
+});
+
+function setContourEffectDist(distVal, selectedId) {
+    closeAllDropdowns();
+    contourEffectDist = distVal;
+
+    ['contourDistNarrow', 'contourDistMedium', 'contourDistWide'].forEach(id => {
+        const item = document.getElementById(id);
+        if (item) {
+            const checkElem = item.querySelector('.check-mark');
+            if (checkElem) {
+                checkElem.textContent = (id === selectedId) ? '✓' : '';
+            }
+        }
+    });
+}
+
+function setBrushStep(stepVal, selectedId) {
+    closeAllDropdowns();
+    brushStep = stepVal;
+    
+    ['brushLevelWeak', 'brushLevelMedium', 'brushLevelStrong'].forEach(id => {
+        const item = document.getElementById(id);
+        if (item) {
+            const checkElem = item.querySelector('.check-mark');
+            if (checkElem) {
+                checkElem.textContent = (id === selectedId) ? '✓' : '';
+            }
+        }
+    });
+}
+
+function openHelpPanel(tabId, tutorialType = 'contour') {
+    closeAllDropdowns();
+    const panel = document.getElementById('helpPanel');
+    panel.classList.remove('hidden');
+    switchHelpTab(tabId);
+    if (tabId === 'tutorialTab') {
+        switchTutorialType(tutorialType);
+    }
+    setTimeout(adjustWorkspaceScale, 50);
+}
+
+function closeHelpPanel() {
+    const panel = document.getElementById('helpPanel');
+    panel.classList.add('hidden');
+    setTimeout(adjustWorkspaceScale, 50);
+}
+
+function switchHelpTab(tabId) {
+    const guideTab = document.getElementById('guideTab');
+    const tutorialTab = document.getElementById('tutorialTab');
+    const subTabs = document.getElementById('tutorialSubTabs');
+    
+    document.getElementById('tabBtnTutorial').classList.remove('active');
+    document.getElementById('tabBtnGuide').classList.remove('active');
+
+    if (tabId === 'tutorialTab') {
+        tutorialTab.style.display = 'block';
+        guideTab.style.display = 'none';
+        subTabs.style.display = 'flex';
+        document.getElementById('tabBtnTutorial').classList.add('active');
+    } else {
+        tutorialTab.style.display = 'none';
+        guideTab.style.display = 'block';
+        subTabs.style.display = 'none';
+        document.getElementById('tabBtnGuide').classList.add('active');
+    }
+}
+
+function switchTutorialType(type) {
+    const contourElem = document.getElementById('tutorialContour');
+    const brushElem = document.getElementById('tutorialBrush');
+    const btnContour = document.getElementById('subTabBtnContour');
+    const btnBrush = document.getElementById('subTabBtnBrush');
+
+    if (type === 'brush') {
+        contourElem.style.display = 'none';
+        brushElem.style.display = 'block';
+        btnContour.classList.remove('active');
+        btnBrush.classList.add('active');
+    } else {
+        contourElem.style.display = 'block';
+        brushElem.style.display = 'none';
+        btnContour.classList.add('active');
+        btnBrush.classList.remove('active');
+    }
+}
+
+function get2DElevationColor(h) {
+    if (h <= 0) return { r: 26, g: 26, b: 26 };
+    let ratio = Math.min(1.0, Math.max(0, h / MAX_HEIGHT));
+    let r = 34, g = 139, b = 34;
+    if (ratio < 0.3) {
+        let localRatio = ratio / 0.3;
+        r = Math.floor(34 + (180 - 34) * localRatio);
+        g = Math.floor(139 + (210 - 139) * localRatio);
+        b = Math.floor(34 + (50 - 34) * localRatio);
+    } else if (ratio < 0.65) {
+        let localRatio = (ratio - 0.3) / (0.65 - 0.3);
+        r = Math.floor(180 + (139 - 180) * localRatio);
+        g = Math.floor(210 + (90 - 210) * localRatio);
+        b = Math.floor(50 + (26 - 50) * localRatio);
+    } else {
+        let localRatio = (ratio - 0.65) / (1.0 - 0.65);
+        r = Math.floor(139 + (245 - 139) * localRatio);
+        g = Math.floor(90 + (245 - 90) * localRatio);
+        b = Math.floor(26 + (245 - 26) * localRatio);
+    }
+    return { r, g, b };
+}
+
+function updateLegendVisibility() {
+    const legendElem = document.getElementById('legendMain');
+    if (mainViewMode === '3D' && !useElevationColor) {
+        legendElem.style.visibility = 'hidden';
+    } else {
+        legendElem.style.visibility = 'visible';
+    }
+}
+
+function initElevationLegend() {
+    const canvas = document.getElementById('legendCanvasMain');
+    const ctx = canvas.getContext('2d');
+    const labelsContainer = document.getElementById('legendLabelsMain');
+    const legendContainer = document.getElementById('legendMain');
+    labelsContainer.innerHTML = '';
+
+    const h = canvas.height;
+    const w = canvas.width;
+
+    for (let y = 0; y < h; y++) {
+        let elev = ((h - y) / h) * MAX_HEIGHT;
+        let color = get2DElevationColor(elev);
+        ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+        ctx.fillRect(0, y, w, 1);
+    }
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; ctx.lineWidth = 1;
+    for (let elev = 0; elev <= MAX_HEIGHT; elev += 10) {
+        let yPos = h - (elev / MAX_HEIGHT) * h;
+        if (yPos === h) yPos = h - 1;
+
+        ctx.beginPath(); ctx.moveTo(0, Math.floor(yPos)); ctx.lineTo(w, Math.floor(yPos)); ctx.stroke();
+        const labelElem = document.createElement('div');
+        labelElem.className = 'legend-label-item'; labelElem.style.top = `${yPos}px`;
+        labelElem.textContent = `${elev}m`; labelsContainer.appendChild(labelElem);
+    }
+
+    let isLegendDragging = false;
+
+    function handleLegendSelect(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clickY = (e.clientY - rect.top) / canvasScaleFactor;
+        const clampedY = Math.max(0, Math.min(h, clickY));
+        const rawElev = ((h - clampedY) / h) * MAX_HEIGHT;
+        const elev = Math.round(rawElev / 10) * 10;
+        setSelectedHeight(elev);
+    }
+
+    legendContainer.addEventListener('mousedown', (e) => {
+        isLegendDragging = true;
+        handleLegendSelect(e);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (isLegendDragging) handleLegendSelect(e);
+    });
+
+    window.addEventListener('mouseup', () => {
+        isLegendDragging = false;
+    });
+
+    legendContainer.addEventListener('touchstart', (e) => {
+        isLegendDragging = true;
+        handleLegendSelect(e.touches[0]);
+        e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        if (isLegendDragging) handleLegendSelect(e.touches[0]);
+    });
+
+    window.addEventListener('touchend', () => {
+        isLegendDragging = false;
+    });
+
+    updateLegendPointer();
+    updateLegendVisibility();
+}
+
+function setSelectedHeight(height, skipInputFieldUpdate = false) {
+    currentSelectedHeight = Math.max(0, Math.min(MAX_HEIGHT, height));
+    if (!skipInputFieldUpdate) {
+        document.getElementById('selectedHeightInput').value = currentSelectedHeight;
+    }
+    updateLegendPointer();
+}
+
+function handleHeightDirectInput(valStr) {
+    if (valStr === '') return;
+    let val = parseInt(valStr, 10);
+    if (isNaN(val)) return;
+    setSelectedHeight(val, true);
+}
+
+function validateHeightInput(inputElem) {
+    let val = parseInt(inputElem.value, 10);
+    if (isNaN(val)) {
+        val = currentSelectedHeight;
+    } else {
+        val = Math.max(0, Math.min(MAX_HEIGHT, val));
+    }
+    setSelectedHeight(val, false);
+}
+
+function stepHeight(delta) {
+    setSelectedHeight(currentSelectedHeight + delta);
+}
+
+function changeContourInterval(val) {
+    contourInterval2D = parseFloat(val);
+    if (mainViewMode === '2D') draw2DMain(); else sync2DTo3DMain();
+    if (subViewMode === '2D') draw2DSub(); else sync2DTo3DSub();
+}
+
+function updateLegendPointer() {
+    const pointer = document.getElementById('legendPointer');
+    const canvas = document.getElementById('legendCanvasMain');
+    const h = canvas.height;
+    const yPos = h - (currentSelectedHeight / MAX_HEIGHT) * h;
+    pointer.style.top = `${yPos}px`;
+}
+
+function handleModeSelection(mode) {
+    closeAllDropdowns();
+    if (mainViewMode === '3D') {
+        pendingMode = mode;
+        document.getElementById('editWarningModal').style.display = 'flex';
+        return;
+    }
+    executeMode(mode);
+}
+
+function closeEditWarningModal() {
+    document.getElementById('editWarningModal').style.display = 'none';
+    pendingMode = null;
+}
+
+function confirmSwitchTo2DAndEdit() {
+    closeEditWarningModal();
+    toggleMainViewMode();
+    if (pendingMode) {
+        executeMode(pendingMode);
+        pendingMode = null;
+    }
+}
+
+function executeMode(mode) {
+    if (mode === 'clearAll') {
+        clearAll();
+    } else {
+        setMode(mode);
+    }
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    const badge = document.getElementById('activeToolText');
+    const brushGroup = document.getElementById('brushSizeGroup');
+    const inputHeightGroup = document.getElementById('inputHeightGroup');
+
+    if (mode === 'drawContour') {
+        badge.textContent = '等高線で作成';
+        brushGroup.style.display = 'none';
+        inputHeightGroup.style.display = 'flex';
+    } else if (mode === 'raiseHill') {
+        badge.textContent = 'ブラシで作成';
+        brushGroup.style.display = (mainViewMode === '3D') ? 'none' : 'flex';
+        inputHeightGroup.style.display = 'none';
+    } else if (mode === 'house') {
+        badge.textContent = '家を建てる';
+        brushGroup.style.display = 'none';
+        inputHeightGroup.style.display = 'flex';
+    } else if (mode === 'erase') {
+        badge.textContent = '一部消しゴム';
+        brushGroup.style.display = 'none';
+        inputHeightGroup.style.display = 'flex';
+    }
+
+    if (mainViewMode === '2D') draw2DMain(); else sync2DTo3DMain();
+}
+
+function changeBrushRadius(val) {
+    currentBrushRadius = parseInt(val) - 1;
+    document.getElementById('brushSizeVal').textContent = val;
+}
+
+function triggerFileInput() {
+    closeAllDropdowns();
+    document.getElementById('fileInput').click();
+}
+
+function openServerModal() {
+    closeAllDropdowns();
+    document.getElementById('serverModal').style.display = 'flex';
+}
+
+function closeServerModal() {
+    document.getElementById('serverModal').style.display = 'none';
+}
+
+function setSubTerrainLoadedState(loaded) {
+    isSubTerrainLoaded = loaded;
+    const menuItem = document.getElementById('menuItemSubToMain');
+    if (loaded) {
+        menuItem.classList.remove('disabled');
+    } else {
+        menuItem.classList.add('disabled');
+    }
+}
+
+function applyTerrainDataToSub(data) {
+    if (data.gridSize === GRID_SIZE) {
+        if (data.heightMap) {
+            heightMapSub = data.heightMap.map(row => [...row]);
+        } else if (data.hillBrushMap) {
+            heightMapSub = data.hillBrushMap.map(row => row.map(v => v || 0));
+        }
+        houseMapSub = data.houseMap || Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
         
-        if (viewMode === '2D') draw2D(); else sync2DTo3D();
+        setSubTerrainLoadedState(true);
+
+        if (subViewMode === '2D') draw2DSub(); else sync2DTo3DSub();
         return true;
     }
     return false;
 }
 
-// ★ファイル保存機能
 function saveToFile() {
+    closeAllDropdowns();
     const data = {
         gridSize: GRID_SIZE,
-        heightMap: heightMap,
-        roadMap: roadMap,
-        riverMap: riverMap,
-        houseMap: houseMap
+        heightMap: heightMapMain,
+        houseMap: houseMapMain,
+        contourConstraints: contourConstraintsMain
     };
     
     const jsonStr = JSON.stringify(data, null, 2);
@@ -263,183 +1539,223 @@ function saveToFile() {
     const url = URL.createObjectURL(blob);
     
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'terrain_data.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = 'terrain_data.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
-// ★① ローカルファイルからの読み込み
 function loadFromFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
+    const file = event.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            if (applyTerrainData(data)) {
-                alert('ローカルから地形データを読み込みました。');
-            } else {
-                alert('読み込んだファイルの形式またはグリッドサイズが一致しません。');
+            if (applyTerrainDataToSub(data)) { 
+                if (!isDualScreen) {
+                    toggleScreenLayout(); 
+                }
+                alert('サブ地形にデータを読み込みました。'); 
             }
-        } catch (err) {
-            alert('ファイルの解析に失敗しました。');
-        }
+            else { alert('読み込んだファイルの形式またはサイズが不一致です。'); }
+        } catch (err) { alert('ファイルの解析に失敗しました。'); }
     };
-    reader.readAsText(file);
-    event.target.value = ''; 
+    reader.readAsText(file); event.target.value = ''; 
 }
 
-// ★② サーバー / URLからの読み込み
-async function loadFromUrl() {
-    const url = document.getElementById('serverUrlInput').value.trim();
-    if (!url) {
-        alert('URLを入力してください。');
-        return;
+function copyMainToSub() {
+    closeAllDropdowns();
+    heightMapSub = heightMapMain.map(row => [...row]);
+    houseMapSub = houseMapMain.map(row => [...row]);
+    
+    setSubTerrainLoadedState(true);
+
+    if (!isDualScreen) {
+        toggleScreenLayout();
     }
 
+    if (subViewMode === '2D') {
+        draw2DSub();
+    } else {
+        sync2DTo3DSub();
+    }
+    alert('メイン地形をサブ地形に複製しました。');
+}
+
+function applySubToMain() {
+    closeAllDropdowns();
+    if (!isSubTerrainLoaded) return;
+
+    saveHistory();
+    heightMapMain = heightMapSub.map(row => [...row]);
+    houseMapMain = houseMapSub.map(row => [...row]);
+
+    if (mainViewMode === '2D') {
+        draw2DMain();
+    } else {
+        sync2DTo3DMain();
+    }
+    alert('サブ地形のデータをメイン地形に反映しました。');
+}
+
+async function loadFromUrl() {
+    const url = document.getElementById('serverUrlInput').value.trim();
+    if (!url) { alert('URLを入力してください。'); return; }
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTPエラー Status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Status: ${response.status}`);
         const data = await response.json();
-        if (applyTerrainData(data)) {
-            alert('サーバーから地形データを読み込みました。');
-        } else {
-            alert('取得したデータの形式またはグリッドサイズが一致しません。');
+        if (applyTerrainDataToSub(data)) { 
+            closeServerModal();
+            if (!isDualScreen) {
+                toggleScreenLayout(); 
+            }
+            alert('サブ地形にデータを読み込みました。');
+        } else { 
+            alert('取得したデータの形式が不一致です。'); 
         }
-    } catch (err) {
-        alert(`サーバーからの読み込みに失敗しました。\n詳細: ${err.message}`);
+    } catch (err) { alert(`読み込みに失敗しました。\n詳細: ${err.message}`); }
+}
+
+function updateHistoryButtons() {
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    if (mainViewMode === '3D') {
+        undoBtn.disabled = true;
+        redoBtn.disabled = true;
+    } else {
+        undoBtn.disabled = historyStack.length === 0;
+        redoBtn.disabled = redoStack.length === 0;
     }
 }
 
 function saveHistory() {
     const snapshot = {
-        height: heightMap.map(row => [...row]),
-        road: roadMap.map(row => [...row]),
-        river: riverMap.map(row => [...row]),
-        house: houseMap.map(row => [...row])
+        heights: heightMapMain.map(row => [...row]),
+        house: houseMapMain.map(row => [...row]),
+        constraints: contourConstraintsMain.map(row => [...row])
     };
     historyStack.push(snapshot);
     if (historyStack.length > MAX_HISTORY) { historyStack.shift(); }
+    redoStack = []; 
+    updateHistoryButtons();
 }
 
 function undo() {
-    if (viewMode === '3D' || historyStack.length === 0) return;
+    if (mainViewMode === '3D' || historyStack.length === 0) return;
+    
+    const currentState = {
+        heights: heightMapMain.map(row => [...row]),
+        house: houseMapMain.map(row => [...row]),
+        constraints: contourConstraintsMain.map(row => [...row])
+    };
+    redoStack.push(currentState);
+
     const previousState = historyStack.pop();
-    heightMap = previousState.height;
-    roadMap = previousState.road;
-    riverMap = previousState.river;
-    houseMap = previousState.house;
-    draw2D();
+    heightMapMain = previousState.heights;
+    houseMapMain = previousState.house;
+    contourConstraintsMain = previousState.constraints
+        ? previousState.constraints.map(row => [...row])
+        : Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(null));
+    
+    draw2DMain();
+    updateHistoryButtons();
 }
 
-function get3DTerrainColor(h) {
-    if (!useElevationColor3D || h <= 0) {
-        return { r: 34, g: 139, b: 34 }; 
-    }
-    let r = 34, g = 139, b = 34;
-    if (h < 12) {
-        let ratio = h / 12;
-        r = Math.floor(34 + (180 - 34) * ratio);
-        g = Math.floor(139 + (210 - 139) * ratio);
-        b = Math.floor(34 + (50 - 34) * ratio);
-    } else if (h < 26) {
-        let ratio = (h - 12) / (26 - 12);
-        r = Math.floor(180 + (139 - 180) * ratio);
-        g = Math.floor(210 + (90 - 210) * ratio);
-        b = Math.floor(50 + (26 - 50) * ratio);
-    } else {
-        let ratio = Math.min(1.0, (h - 26) / (MAX_HEIGHT - 26));
-        r = Math.floor(139 + (245 - 139) * ratio);
-        g = Math.floor(90 + (245 - 90) * ratio);
-        b = Math.floor(26 + (245 - 26) * ratio);
-    }
-    return { r, g, b };
+function redo() {
+    if (mainViewMode === '3D' || redoStack.length === 0) return;
+
+    const currentState = {
+        heights: heightMapMain.map(row => [...row]),
+        house: houseMapMain.map(row => [...row]),
+        constraints: contourConstraintsMain.map(row => [...row])
+    };
+    historyStack.push(currentState);
+
+    const nextState = redoStack.pop();
+    heightMapMain = nextState.heights;
+    houseMapMain = nextState.house;
+    contourConstraintsMain = nextState.constraints
+        ? nextState.constraints.map(row => [...row])
+        : Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(null));
+
+    draw2DMain();
+    updateHistoryButtons();
 }
 
-function init3D() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a);
+function create3DScene(canvas) {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x12171f);
 
-    camera = new THREE.PerspectiveCamera(45, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 1000);
-    resetCameraPosition();
+    const camera = new THREE.PerspectiveCamera(45, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 1000);
+    camera.position.set(GRID_SIZE / 2, GRID_SIZE, GRID_SIZE * 1.2);
 
-    renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(GRID_SIZE / 2, 0, GRID_SIZE / 2); 
     controls.enableDamping = true; 
     controls.dampingFactor = 0.05;
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
     dirLight.position.set(1, 2, 1).normalize();
-    scene.add(dirLight);
+    scene.add(dirLight); 
     scene.add(new THREE.AmbientLight(0x666666));
 
     const geometry = new THREE.PlaneGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
     geometry.rotateX(-Math.PI / 2); 
     geometry.translate(GRID_SIZE / 2, 0, GRID_SIZE / 2);
 
-    customMaterial = new THREE.MeshLambertMaterial({
-        vertexColors: true,
-        flatShading: true
-    });
-
+    const customMaterial = new THREE.MeshLambertMaterial({ vertexColors: true });
+    
     customMaterial.onBeforeCompile = (shader) => {
         shader.uniforms.uShowContour = { value: showContour3D };
+        shader.uniforms.uContourInterval = { value: contourInterval2D * 0.12 };
         customMaterial.userData.shader = shader;
 
-        shader.vertexShader = `
-            varying float vHeightY;
-        ` + shader.vertexShader;
-
+        shader.vertexShader = `varying float vHeightY;\n` + shader.vertexShader;
         shader.vertexShader = shader.vertexShader.replace(
             `#include <begin_vertex>`,
-            `#include <begin_vertex>
-             vHeightY = position.y;
-            `
+            `#include <begin_vertex>\nvHeightY = position.y;\n`
         );
-
+        
         shader.fragmentShader = `
             uniform bool uShowContour;
+            uniform float uContourInterval;
             varying float vHeightY;
         ` + shader.fragmentShader;
-
+        
         shader.fragmentShader = shader.fragmentShader.replace(
             `vec4 diffuseColor = vec4( diffuse, opacity );`,
-            `
-            vec4 diffuseColor = vec4( diffuse, opacity );
-            if (uShowContour) {
-                float interval = 0.9; 
-                float modulo = mod(vHeightY, interval);
-                float thickness = 0.05; 
-                if (modulo < thickness || modulo > (interval - thickness)) {
-                    diffuseColor.rgb *= 0.1;
+            `vec4 diffuseColor = vec4( diffuse, opacity );
+            if (uShowContour && vHeightY >= 0.12) {
+                float interval = max(uContourInterval, 0.01); 
+                float val = vHeightY / interval;
+                float f = abs(fract(val - 0.5) - 0.5);
+                float df = fwidth(vHeightY); 
+                if (df > 0.0) {
+                    float line = smoothstep(0.5 * df, 0.0, f * interval);
+                    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.1), clamp(line, 0.0, 0.75));
                 }
-            }
-            `
+            }`
         );
     };
 
-    const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.12 });
-    
-    terrainMesh = new THREE.Mesh(geometry, customMaterial);
-    const wireframe = new THREE.Mesh(geometry, wireframeMaterial);
-    terrainMesh.add(wireframe);
+    const terrainMesh = new THREE.Mesh(geometry, customMaterial);
     scene.add(terrainMesh);
+
+    return { scene, camera, renderer, controls, terrainMesh, customMaterial };
 }
 
-function resetCameraPosition() {
-    camera.position.set(GRID_SIZE / 2, GRID_SIZE, GRID_SIZE * 1.2);
+function init3D() {
+    const m = create3DScene(canvas3dMain);
+    sceneMain = m.scene; cameraMain = m.camera; rendererMain = m.renderer; controlsMain = m.controls; terrainMeshMain = m.terrainMesh; customMaterialMain = m.customMaterial;
+
+    const s = create3DScene(canvas3dSub);
+    sceneSub = s.scene; cameraSub = s.camera; rendererSub = s.renderer; controlsSub = s.controls; terrainMeshSub = s.terrainMesh; customMaterialSub = s.customMaterial;
 }
 
-function sync2DTo3D() {
+function sync2DTo3DGeneric(heightMap, houseMap, terrainMesh, customMaterial, scene, grpHouse) {
     const position = terrainMesh.geometry.attributes.position;
     const count = position.count;
     const colors = new Float32Array(count * 3);
@@ -448,10 +1764,9 @@ function sync2DTo3D() {
         for (let y = 0; y < GRID_SIZE; y++) {
             const index = y * GRID_SIZE + x;
             let h = heightMap[x][y];
-            if (riverMap[x][y]) { h = Math.max(0, h - 2.0); }
-            position.setY(index, h * 0.3); 
+            position.setY(index, h * 0.12); 
 
-            const c = get3DTerrainColor(heightMap[x][y]);
+            const c = (useElevationColor && h > 0) ? get2DElevationColor(h) : { r: 34, g: 139, b: 34 };
             colors[index * 3]     = c.r / 255;
             colors[index * 3 + 1] = c.g / 255;
             colors[index * 3 + 2] = c.b / 255;
@@ -463,381 +1778,642 @@ function sync2DTo3D() {
     terrainMesh.geometry.attributes.color.needsUpdate = true;
     terrainMesh.geometry.computeVertexNormals(); 
 
-    if (customMaterial.userData.shader) {
-        customMaterial.userData.shader.uniforms.uShowContour.value = showContour3D;
+    if (customMaterial.userData.shader) { 
+        customMaterial.userData.shader.uniforms.uShowContour.value = showContour3D; 
+        customMaterial.userData.shader.uniforms.uContourInterval.value = contourInterval2D * 0.12;
     }
 
-    roadSegments.forEach(seg => scene.remove(seg)); roadSegments = [];
-    riverSegments.forEach(seg => scene.remove(seg)); riverSegments = [];
-    houseGroups.forEach(group => scene.remove(group)); houseGroups = [];
+    grpHouse.forEach(g => scene.remove(g)); grpHouse.length = 0;
 
-    const roadMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 }); 
-    const roadWidth = 0.85;
-    for (let x = 0; x < GRID_SIZE; x++) {
-        for (let y = 0; y < GRID_SIZE; y++) {
-            if (roadMap[x][y]) {
-                const currentHeight = heightMap[x][y] * 0.3;
-                const roadGeom = new THREE.PlaneGeometry(roadWidth, roadWidth);
-                roadGeom.rotateX(-Math.PI / 2);
-                const roadMesh = new THREE.Mesh(roadGeom, roadMaterial);
-                roadMesh.position.set(x + 0.5, currentHeight + 0.02, y + 0.5);
-                scene.add(roadMesh);
-                roadSegments.push(roadMesh);
-            }
-        }
-    }
-
-    const riverMaterial = new THREE.MeshLambertMaterial({ color: 0x1d63ed }); 
-    const riverWidth = 1.0; 
-    for (let x = 0; x < GRID_SIZE; x++) {
-        for (let y = 0; y < GRID_SIZE; y++) {
-            if (riverMap[x][y]) {
-                const currentHeight = (heightMap[x][y] - 0.6) * 0.3;
-                const riverGeom = new THREE.PlaneGeometry(riverWidth, riverWidth);
-                riverGeom.rotateX(-Math.PI / 2);
-                const riverMesh = new THREE.Mesh(riverGeom, riverMaterial);
-                riverMesh.position.set(x + 0.5, Math.max(0.01, currentHeight), y + 0.5);
-                scene.add(riverMesh);
-                riverSegments.push(riverMesh);
-            }
-        }
-    }
-
-    const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xeeeeee }); 
-    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xdc3545 }); 
-    for (let x = 0; x < GRID_SIZE; x++) {
-        for (let y = 0; y < GRID_SIZE; y++) {
-            if (houseMap[x][y]) {
-                const currentHeight = heightMap[x][y] * 0.3;
-                const houseGroup = new THREE.Group();
-                const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.7), wallMaterial);
-                wallMesh.position.y = 0.3;
-                houseGroup.add(wallMesh);
-                const roofGeom = new THREE.ConeGeometry(0.55, 0.4, 4);
-                roofGeom.rotateY(Math.PI / 4);
-                const roofMesh = new THREE.Mesh(roofGeom, roofMaterial);
-                roofMesh.position.y = 0.8;
-                houseGroup.add(roofMesh);
-                houseGroup.position.set(x + 0.5, currentHeight, y + 0.5);
-                scene.add(houseGroup);
-                houseGroups.push(houseGroup);
-            }
-        }
-    }
-}
-
-function animate3D() {
-    if (viewMode !== '3D') return;
-    requestAnimationFrame(animate3D);
-    controls.update(); 
-    renderer.render(scene, camera);
-}
-
-function toggleElevationColor() {
-    if (viewMode !== '3D') return;
-    useElevationColor3D = !useElevationColor3D;
-    const btn = document.getElementById('colorToggleBtn');
-    if (useElevationColor3D) {
-        btn.innerText = '標高の色分け: ON'; btn.classList.add('active');
-    } else {
-        btn.innerText = '標高の色分け: OFF'; btn.classList.remove('active');
-    }
-    sync2DTo3D();
-}
-
-function toggleContourLine() {
-    const btn = document.getElementById('contourToggleBtn');
-    if (viewMode === '3D') {
-        showContour3D = !showContour3D;
-        if (showContour3D) {
-            btn.innerText = '等高線: ON'; btn.classList.add('active');
-        } else {
-            btn.innerText = '等高線: OFF'; btn.classList.remove('active');
-        }
-        sync2DTo3D();
-    } else {
-        showContour2D = !showContour2D;
-        if (showContour2D) {
-            btn.innerText = '等高線: ON'; btn.classList.add('active');
-        } else {
-            btn.innerText = '等高線: OFF'; btn.classList.remove('active');
-        }
-        draw2D();
-    }
-}
-
-function setMode(mode) {
-    if (viewMode === '3D') return; 
-    currentMode = mode;
-    document.getElementById('raiseBtn').classList.toggle('active', mode === 'raise');
-    document.getElementById('roadBtn').classList.toggle('active', mode === 'road');
-    document.getElementById('riverBtn').classList.toggle('active', mode === 'river');
-    document.getElementById('houseBtn').classList.toggle('active', mode === 'house');
-    document.getElementById('eraseBtn').classList.toggle('active', mode === 'erase');
-
-    const brushArea = document.getElementById('brushSizeArea');
-    brushArea.style.opacity = (mode === 'house') ? "0.4" : "1.0";
-}
-
-function setBrushSize(size) {
-    if (currentMode === 'house') return; 
-    document.getElementById('sizeMinBtn').classList.remove('active');
-    document.getElementById('sizeSmallBtn').classList.remove('active');
-    document.getElementById('sizeLargeBtn').classList.remove('active');
-
-    if (size === 'min') { currentBrushRadius = 0.5; document.getElementById('sizeMinBtn').classList.add('active'); }
-    else if (size === 'small') { currentBrushRadius = 1.0; document.getElementById('sizeSmallBtn').classList.add('active'); }
-    else if (size === 'large') { currentBrushRadius = 2.5; document.getElementById('sizeLargeBtn').classList.add('active'); }
-}
-
-function toggleViewMode() {
-    const btn = document.getElementById('viewBtn');
-    const toggleBtn = document.getElementById('colorToggleBtn');
-    const contourBtn = document.getElementById('contourToggleBtn'); 
-    const loadLabel = document.getElementById('loadLabel');
-    const serverBtn = document.getElementById('serverLoadBtn');
-    const urlInput = document.getElementById('serverUrlInput');
-    const guide = document.getElementById('guideText');
-    
-    if (viewMode === '2D') {
-        viewMode = '3D';
-        btn.innerText = '2Dエディタに戻る';
-        toggleBtn.style.display = 'inline-block';
-        
-        contourBtn.innerText = showContour3D ? '等高線: ON' : '等高線: OFF';
-        contourBtn.classList.toggle('active', showContour3D);
-        
-        canvas2d.style.display = 'none'; canvas3d.style.display = 'block';
-        canvas3d.style.zIndex = '2'; canvas2d.style.zIndex = '1';
-        guide.innerHTML = '【3D操作】 ドラッグ: 回転 / ホイール: ズーム / 右クリックドラッグ: 並行移動';
-        
-        ['raiseBtn','roadBtn','riverBtn','houseBtn','eraseBtn','sizeMinBtn','sizeSmallBtn','sizeLargeBtn','undoBtn'].forEach(id => {
-            document.getElementById(id).disabled = true;
-        });
-        loadLabel.classList.add('disabled');
-        serverBtn.disabled = true;
-        urlInput.disabled = true;
-
-        sync2DTo3D();
-        resetCameraPosition(); 
-        controls.target.set(GRID_SIZE / 2, 0, GRID_SIZE / 2);
-        controls.update();
-        animate3D(); 
-    } else {
-        viewMode = '2D';
-        btn.innerText = '3D表示に切り替え';
-        toggleBtn.style.display = 'none';
-        
-        contourBtn.innerText = showContour2D ? '等高線: ON' : '等高線: OFF';
-        contourBtn.classList.toggle('active', showContour2D);
-        
-        canvas2d.style.display = 'block'; canvas3d.style.display = 'none';
-        canvas2d.style.zIndex = '2'; canvas3d.style.zIndex = '1';
-        guide.innerText = '選択中のモードで画面をドラッグしてください。';
-        
-        ['raiseBtn','roadBtn','riverBtn','houseBtn','eraseBtn','sizeMinBtn','sizeSmallBtn','sizeLargeBtn','undoBtn'].forEach(id => {
-            document.getElementById(id).disabled = false;
-        });
-        loadLabel.classList.remove('disabled');
-        serverBtn.disabled = false;
-        urlInput.disabled = false;
-        draw2D();
-    }
-}
-
-function clearAll() {
-    if (confirm('すべてリセットしますか？')) {
-        saveHistory();
-        for (let x = 0; x < GRID_SIZE; x++) {
-            heightMap[x].fill(0); roadMap[x].fill(false); riverMap[x].fill(false); houseMap[x].fill(false);
-        }
-        if (viewMode === '2D') draw2D(); else sync2DTo3D();
-    }
-}
-
-function drawSmoothContours2D() {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas2d.width, canvas2d.height);
-
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#111111';
-
-    const contourInterval = 3.0; 
-    const maxH = MAX_HEIGHT;
-
-    function interp(v1, v2, target) {
-        if (Math.abs(v1 - v2) < 0.00001) return 0.5;
-        return (target - v1) / (v2 - v1);
-    }
-
-    for (let targetLevel = contourInterval; targetLevel <= maxH; targetLevel += contourInterval) {
-        for (let x = 0; x < GRID_SIZE - 1; x++) {
-            for (let y = 0; y < GRID_SIZE - 1; y++) {
-                const vTL = heightMap[x][y];
-                const vTR = heightMap[x + 1][y];
-                const vBR = heightMap[x + 1][y + 1];
-                const vBL = heightMap[x][y + 1];
-
-                const bTL = vTL >= targetLevel ? 8 : 0;
-                const bTR = vTR >= targetLevel ? 4 : 0;
-                const bBR = vBR >= targetLevel ? 2 : 0;
-                const bBL = vBL >= targetLevel ? 1 : 0;
-                const squareIndex = bTL | bTR | bBR | bBL;
-
-                if (squareIndex === 0 || squareIndex === 15) continue;
-
-                const pxTL = x * CELL_SIZE;
-                const pyTL = y * CELL_SIZE;
-
-                const topPt = { x: pxTL + interp(vTL, vTR, targetLevel) * CELL_SIZE, y: pyTL };
-                const rightPt = { x: pxTL + CELL_SIZE, y: pyTL + interp(vTR, vBR, targetLevel) * CELL_SIZE };
-                const bottomPt = { x: pxTL + interp(vBL, vBR, targetLevel) * CELL_SIZE, y: pyTL + CELL_SIZE };
-                const leftPt = { x: pxTL, y: pyTL + interp(vTL, vBL, targetLevel) * CELL_SIZE };
-
-                ctx.beginPath();
-                switch (squareIndex) {
-                    case 1: case 14: ctx.moveTo(leftPt.x, leftPt.y); ctx.lineTo(bottomPt.x, bottomPt.y); break;
-                    case 2: case 13: ctx.moveTo(bottomPt.x, bottomPt.y); ctx.lineTo(rightPt.x, rightPt.y); break;
-                    case 3: case 12: ctx.moveTo(leftPt.x, leftPt.y); ctx.lineTo(rightPt.x, rightPt.y); break;
-                    case 4: case 11: ctx.moveTo(topPt.x, topPt.y); ctx.lineTo(rightPt.x, rightPt.y); break;
-                    case 5:
-                        ctx.moveTo(leftPt.x, leftPt.y); ctx.lineTo(topPt.x, topPt.y);
-                        ctx.moveTo(bottomPt.x, bottomPt.y); ctx.lineTo(rightPt.x, rightPt.y); break;
-                    case 6: case 9: ctx.moveTo(topPt.x, topPt.y); ctx.lineTo(bottomPt.x, bottomPt.y); break;
-                    case 7: case 8: ctx.moveTo(leftPt.x, leftPt.y); ctx.lineTo(topPt.x, topPt.y); break;
-                    case 10:
-                        ctx.moveTo(leftPt.x, leftPt.y); ctx.lineTo(bottomPt.x, bottomPt.y);
-                        ctx.moveTo(topPt.x, topPt.y); ctx.lineTo(rightPt.x, rightPt.y); break;
-                }
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-function draw2D() {
-    ctx.clearRect(0, 0, canvas2d.width, canvas2d.height);
-
-    if (showContour2D) {
-        drawSmoothContours2D();
-        return;
-    }
+    const wallMat = new THREE.MeshLambertMaterial({ color: 0xeeeeee });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0xdc3545 });
 
     for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
             const h = heightMap[x][y];
-            
-            let red = 30, green = 30, blue = 30;
-            if (h > 0) {
-                green = Math.min(255, Math.floor(30 + h * 6));
-                red = Math.min(255, Math.floor(30 + Math.max(0, h - 20) * 12));
-                blue = Math.min(255, Math.floor(30 + Math.max(0, h - 35) * 15));
-            }
-            
-            if (roadMap[x][y]) {
-                red = Math.floor(red * 0.4 + 100); 
-                green = Math.floor(green * 0.4 + 100); 
-                blue = Math.floor(blue * 0.4 + 100);
-            } 
-            else if (riverMap[x][y]) {
-                red = Math.floor(red * 0.2 + 20); 
-                green = Math.floor(green * 0.4 + 80); 
-                blue = Math.floor(blue * 0.3 + 200);
-            }
-
-            ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
-            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-
+            const ch = h * 0.12;
             if (houseMap[x][y]) {
-                ctx.fillStyle = '#dc3545'; 
-                ctx.fillRect(x * CELL_SIZE + 2, y * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-                ctx.fillStyle = '#eeeeee'; 
-                ctx.fillRect(x * CELL_SIZE + 5, y * CELL_SIZE + 5, 2, 2);
+                const group = new THREE.Group();
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.7), wallMat); wall.position.y = 0.3; group.add(wall);
+                const roofGeom = new THREE.ConeGeometry(0.55, 0.4, 4); roofGeom.rotateY(Math.PI / 4);
+                const roof = new THREE.Mesh(roofGeom, roofMat); roof.position.y = 0.8; group.add(roof);
+
+                group.position.set(x + 0.5, ch, y + 0.5);
+                scene.add(group); grpHouse.push(group);
             }
         }
-    }
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
-    for (let x = 0; x <= GRID_SIZE; x++) {
-        ctx.beginPath(); ctx.moveTo(x * CELL_SIZE, 0); ctx.lineTo(x * CELL_SIZE, canvas2d.height); ctx.stroke();
-    }
-    for (let y = 0; y <= GRID_SIZE; y++) {
-        ctx.beginPath(); ctx.moveTo(0, y * CELL_SIZE); ctx.lineTo(canvas2d.width, y * CELL_SIZE); ctx.stroke();
     }
 }
 
-function editTerrain(pointerX, pointerY) {
-    if (viewMode === '3D') return; 
+function sync2DTo3DMain() { sync2DTo3DGeneric(heightMapMain, houseMapMain, terrainMeshMain, customMaterialMain, sceneMain, houseGroupsMain); }
+function sync2DTo3DSub() { sync2DTo3DGeneric(heightMapSub, houseMapSub, terrainMeshSub, customMaterialSub, sceneSub, houseGroupsSub); }
 
-    const rect = canvas2d.getBoundingClientRect();
-    const mouseXInGrid = (pointerX - rect.left) / CELL_SIZE;
-    const mouseYInGrid = (pointerY - Math.max(0, rect.top)) / CELL_SIZE;
+function animate3D() {
+    if (mainViewMode !== '3D' && subViewMode !== '3D') return;
+    requestAnimationFrame(animate3D);
 
-    const clickX = Math.floor(mouseXInGrid);
-    const clickY = Math.floor(mouseYInGrid);
-
-    if (clickX < 0 || clickX >= GRID_SIZE || clickY < 0 || clickY >= GRID_SIZE) return;
-
-    if (!hasChangedThisStroke) {
-        saveHistory();
-        hasChangedThisStroke = true;
+    if (mainViewMode === '3D') {
+        controlsMain.update(); rendererMain.render(sceneMain, cameraMain);
     }
+    if (isDualScreen && subViewMode === '3D') {
+        controlsSub.update(); rendererSub.render(sceneSub, cameraSub);
+    }
+}
 
-    if (currentMode === 'house') {
-        if (lastPlacedHouseCell.x === clickX && lastPlacedHouseCell.y === clickY) return;
-        if (!riverMap[clickX][clickY]) {
-            houseMap[clickX][clickY] = true;
-            roadMap[clickX][clickY] = false; 
-            lastPlacedHouseCell = { x: clickX, y: clickY };
+function toggleElevationColor() {
+    useElevationColor = !useElevationColor;
+    document.getElementById('menuItemColor').textContent = `標高の色分け: ${useElevationColor ? 'ON' : 'OFF'}`;
+    closeAllDropdowns();
+    
+    updateLegendVisibility();
+
+    if (mainViewMode === '3D') sync2DTo3DMain(); else draw2DMain();
+    if (subViewMode === '3D') sync2DTo3DSub(); else draw2DSub();
+}
+
+function toggleContourLine() {
+    closeAllDropdowns();
+    showContour3D = !showContour3D;
+    showContour2D = !showContour2D;
+    document.getElementById('menuItemContour').textContent = `等高線: ${showContour2D ? 'ON' : 'OFF'}`;
+
+    if (mainViewMode === '3D') sync2DTo3DMain(); else draw2DMain();
+    if (subViewMode === '3D') sync2DTo3DSub(); else draw2DSub();
+}
+
+function resetMainTerrain() {
+    currentStrokePoints = [];
+    for (let x = 0; x < GRID_SIZE; x++) {
+        heightMapMain[x].fill(0);
+        houseMapMain[x].fill(false);
+        contourConstraintsMain[x].fill(null);
+    }
+    historyStack = [];
+    redoStack = [];
+    updateHistoryButtons();
+}
+
+function toggleMainViewModeFromMenu() {
+    closeAllDropdowns();
+    toggleMainViewMode();
+}
+
+function toggleSubViewModeFromMenu() {
+    closeAllDropdowns();
+    toggleSubViewMode();
+}
+
+function toggleScreenLayoutFromMenu() {
+    closeAllDropdowns();
+    toggleScreenLayout();
+}
+
+function toggleScreenLayout() {
+    isDualScreen = !isDualScreen;
+    const subCard = document.getElementById('subCard');
+    const subViewBtn = document.getElementById('subViewBtn');
+    const menuItemScreen = document.getElementById('menuItemScreenLayout');
+
+    if (isDualScreen) {
+        subCard.style.display = 'flex';
+        subViewBtn.style.display = 'flex';
+        menuItemScreen.textContent = '📱 一画面表示';
+        if (subViewMode === '2D') {
+            draw2DSub();
+        } else {
+            sync2DTo3DSub();
         }
-        draw2D();
-        return;
+        if (mainViewMode === '3D' || subViewMode === '3D') animate3D();
+    } else {
+        subCard.style.display = 'none';
+        subViewBtn.style.display = 'none';
+        menuItemScreen.textContent = '📱📱 二画面表示';
+    }
+    adjustWorkspaceScale();
+}
+
+function toggleMainViewMode() {
+    const btn = document.getElementById('mainViewBtn');
+    const menuItem = document.getElementById('menuItemMainViewMode');
+    const brushGroup = document.getElementById('brushSizeGroup');
+    const hintMain = document.getElementById('hintMain3D');
+    
+    if (mainViewMode === '2D') {
+        mainViewMode = '3D';
+        btn.textContent = '🌐 メイン 3D';
+        btn.className = 'view-toggle-btn btn-3d';
+        menuItem.textContent = '🧊 メイン地形: 2D表示';
+        
+        if (brushGroup) brushGroup.style.display = 'none';
+        if (hintMain) hintMain.classList.add('visible');
+
+        canvas2dMain.style.display = 'none'; canvas3dMain.style.display = 'block';
+
+        sync2DTo3DMain();
+        animate3D(); 
+    } else {
+        mainViewMode = '2D';
+        btn.textContent = '🧊 メイン 2D';
+        btn.className = 'view-toggle-btn btn-2d';
+        menuItem.textContent = '🌐 メイン地形: 3D表示';
+        
+        if (currentMode === 'raiseHill' && brushGroup) {
+            brushGroup.style.display = 'flex';
+        }
+        if (hintMain) hintMain.classList.remove('visible');
+
+        canvas2dMain.style.display = 'block'; canvas3dMain.style.display = 'none';
+        
+        draw2DMain();
     }
 
-    const searchRange = Math.ceil(currentBrushRadius) + 1;
-    for (let x = Math.max(0, clickX - searchRange); x <= Math.min(GRID_SIZE - 1, clickX + searchRange); x++) {
-        for (let y = Math.max(0, clickY - searchRange); y <= Math.min(GRID_SIZE - 1, clickY + searchRange); y++) {
-            const distance = Math.sqrt((x + 0.5 - mouseXInGrid) ** 2 + (y + 0.5 - mouseYInGrid) ** 2);
-            
-            if (distance <= currentBrushRadius) {
-                if (currentMode === 'road') {
-                    roadMap[x][y] = true; riverMap[x][y] = false; houseMap[x][y] = false;
-                } else if (currentMode === 'river') {
-                    riverMap[x][y] = true; roadMap[x][y] = false; houseMap[x][y] = false;
-                } else {
-                    const t = distance / currentBrushRadius;
-                    const hillFactor = (Math.cos(t * Math.PI) + 1) / 2; 
-                    
-                    if (currentMode === 'raise') {
-                        heightMap[x][y] = Math.min(MAX_HEIGHT, heightMap[x][y] + hillFactor * BRUSH_SPEED);
-                    } else if (currentMode === 'erase') {
-                        heightMap[x][y] = Math.max(0, heightMap[x][y] - hillFactor * ERASE_SPEED);
-                        roadMap[x][y] = false; riverMap[x][y] = false; houseMap[x][y] = false;
+    updateLegendVisibility();
+    updateHistoryButtons();
+}
+
+function toggleSubViewMode() {
+    const btn = document.getElementById('subViewBtn');
+    const menuItem = document.getElementById('menuItemSubViewMode');
+    const hintSub = document.getElementById('hintSub3D');
+    
+    if (subViewMode === '2D') {
+        subViewMode = '3D';
+        btn.textContent = '🌐 サブ 3D';
+        btn.className = 'view-toggle-btn btn-3d';
+        menuItem.textContent = '🧊 サブ地形: 2D表示';
+        if (hintSub) hintSub.classList.add('visible');
+        
+        canvas2dSub.style.display = 'none'; canvas3dSub.style.display = 'block';
+
+        sync2DTo3DSub();
+        if (isDualScreen) animate3D();
+    } else {
+        subViewMode = '2D';
+        btn.textContent = '🧊 サブ 2D';
+        btn.className = 'view-toggle-btn btn-2d';
+        menuItem.textContent = '🧊 サブ地形: 3D表示';
+        if (hintSub) hintSub.classList.remove('visible');
+        
+        canvas2dSub.style.display = 'block'; canvas3dSub.style.display = 'none';
+        
+        draw2DSub();
+    }
+}
+
+function clearAll() {
+    if (confirm('メイン地形をすべてリセットしますか？')) {
+        saveHistory();
+        resetMainTerrain();
+        if (mainViewMode === '2D') draw2DMain(); else sync2DTo3DMain();
+    }
+}
+
+function drawAutoContoursFromHeightMap(ctx, heightMap) {
+    if (!showContour2D) return;
+
+    const EPS = 1e-7;
+
+    const lerpPoint = (x1, y1, x2, y2, v1, v2, targetH) => {
+        const dv = v2 - v1;
+        if (Math.abs(dv) < EPS) {
+            return { x: (x1 + x2) * 0.5, y: (y1 + y2) * 0.5 };
+        }
+        let t = (targetH - v1) / dv;
+        t = Math.max(0, Math.min(1, t));
+        return {
+            x: x1 + (x2 - x1) * t,
+            y: y1 + (y2 - y1) * t
+        };
+    };
+
+    const getCellSegments = (x, y, v0, v1, v2, v3, targetH) => {
+        const b0 = v0 >= targetH;
+        const b1 = v1 >= targetH;
+        const b2 = v2 >= targetH;
+        const b3 = v3 >= targetH;
+
+        let caseIndex = (b0 ? 1 : 0) | (b1 ? 2 : 0) | (b2 ? 4 : 0) | (b3 ? 8 : 0);
+        if (caseIndex === 0 || caseIndex === 15) return [];
+
+        const leftX = (x + 0.5) * CELL_SIZE;
+        const rightX = (x + 1.5) * CELL_SIZE;
+        const topY = (y + 0.5) * CELL_SIZE;
+        const bottomY = (y + 1.5) * CELL_SIZE;
+
+        const top = () => lerpPoint(leftX, topY, rightX, topY, v0, v1, targetH);
+        const right = () => lerpPoint(rightX, topY, rightX, bottomY, v1, v2, targetH);
+        const bottom = () => lerpPoint(leftX, bottomY, rightX, bottomY, v3, v2, targetH);
+        const left = () => lerpPoint(leftX, topY, leftX, bottomY, v0, v3, targetH);
+
+        const seg = (a, b) => {
+            const p1 = a(), p2 = b();
+            if (Math.hypot(p1.x - p2.x, p1.y - p2.y) < 0.01) return null;
+            return [p1, p2];
+        };
+
+        const result = [];
+        switch (caseIndex) {
+            case 1: case 14: result.push(seg(left, top)); break;
+            case 2: case 13: result.push(seg(top, right)); break;
+            case 3: case 12: result.push(seg(left, right)); break;
+            case 4: case 11: result.push(seg(right, bottom)); break;
+            case 6: case 9:  result.push(seg(top, bottom)); break;
+            case 7: case 8:  result.push(seg(left, bottom)); break;
+            case 5: case 10: {
+                const a = v0 - targetH, b = v1 - targetH, c = v2 - targetH, d = v3 - targetH;
+                const q = a * c - b * d;
+                let connectHighCorners = Math.abs(q) > EPS ? q > 0 : ((v0 + v1 + v2 + v3) * 0.25 >= targetH);
+
+                if (caseIndex === 5) {
+                    if (connectHighCorners) {
+                        result.push(seg(left, top)); result.push(seg(right, bottom));
+                    } else {
+                        result.push(seg(left, bottom)); result.push(seg(top, right));
                     }
+                } else {
+                    if (connectHighCorners) {
+                        result.push(seg(left, bottom)); result.push(seg(top, right));
+                    } else {
+                        result.push(seg(left, top)); result.push(seg(right, bottom));
+                    }
+                }
+                break;
+            }
+        }
+        return result.filter(Boolean);
+    };
+
+    for (let targetH = 0; targetH <= MAX_HEIGHT + EPS; targetH += contourInterval2D) {
+        if (targetH === 0) continue;
+
+        if (useElevationColor) {
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        } else {
+            const c = get2DElevationColor(targetH);
+            ctx.strokeStyle = `rgb(${c.r}, ${c.g}, ${c.b})`;
+        }
+
+        ctx.lineWidth = 1.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+
+        for (let x = 0; x < GRID_SIZE - 1; x++) {
+            for (let y = 0; y < GRID_SIZE - 1; y++) {
+                const v0 = Number.isFinite(heightMap[x][y]) ? heightMap[x][y] : 0;
+                const v1 = Number.isFinite(heightMap[x + 1][y]) ? heightMap[x + 1][y] : 0;
+                const v2 = Number.isFinite(heightMap[x + 1][y + 1]) ? heightMap[x + 1][y + 1] : 0;
+                const v3 = Number.isFinite(heightMap[x][y + 1]) ? heightMap[x][y + 1] : 0;
+
+                const segments = getCellSegments(x, y, v0, v1, v2, v3, targetH);
+                for (const segment of segments) {
+                    const [p1, p2] = segment;
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                }
+            }
+        }
+        ctx.stroke();
+    }
+}
+
+function applyHillBrush(centerX, centerY) {
+    let radius = currentBrushRadius * 0.8;
+    const step = brushStep; 
+
+    for (let dx = -Math.ceil(radius); dx <= Math.ceil(radius); dx++) {
+        for (let dy = -Math.ceil(radius); dy <= Math.ceil(radius); dy++) {
+            if (dx * dx + dy * dy <= radius * radius + 0.1) {
+                let gx = centerX + dx;
+                let gy = centerY + dy;
+                if (gx >= 0 && gx < GRID_SIZE && gy >= 0 && gy < GRID_SIZE) {
+                    heightMapMain[gx][gy] = Math.min(MAX_HEIGHT, heightMapMain[gx][gy] + step);
+                    contourConstraintsMain[gx][gy] = heightMapMain[gx][gy];
                 }
             }
         }
     }
-    draw2D();
 }
 
-canvas2d.addEventListener('mousedown', (e) => { 
-    isDrawing = true; hasChangedThisStroke = false; lastPlacedHouseCell = { x: -1, y: -1 }; editTerrain(e.clientX, e.clientY); 
-});
-window.addEventListener('mousemove', (e) => { if (isDrawing) editTerrain(e.clientX, e.clientY); });
-window.addEventListener('mouseup', () => { isDrawing = false; });
+function applyEraseBrush(centerX, centerY) {
+    const step = 5;
+    if (centerX < 0 || centerX >= GRID_SIZE || centerY < 0 || centerY >= GRID_SIZE) return;
 
-canvas2d.addEventListener('touchstart', (e) => {
-    isDrawing = true; hasChangedThisStroke = false; lastPlacedHouseCell = { x: -1, y: -1 };
-    editTerrain(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault();
+    heightMapMain[centerX][centerY] = Math.max(0, heightMapMain[centerX][centerY] - step);
+    contourConstraintsMain[centerX][centerY] = null;
+    houseMapMain[centerX][centerY] = false;
+}
+
+function applyContourLineToHeightMap(points, targetHeight) {
+    if (points.length < 2) return;
+
+    const cleanPoints = points.map(p => ({x: p.x, y: p.y}));
+    const isClosed = Math.hypot(
+        cleanPoints[0].x - cleanPoints[cleanPoints.length - 1].x,
+        cleanPoints[0].y - cleanPoints[cleanPoints.length - 1].y
+    ) < 30;
+
+    if (isClosed) {
+        const a = cleanPoints[cleanPoints.length - 1];
+        const b = cleanPoints[0];
+        if (Math.hypot(a.x - b.x, a.y - b.y) > 0.5) cleanPoints.push({...b});
+    }
+
+    const fixed = Array.from(
+        { length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)
+    );
+    
+    let originalHeights = heightMapMain.map(row => row.map(v =>
+        Number.isFinite(v) ? Math.max(0, Math.min(MAX_HEIGHT, v)) : 0
+    ));
+    
+    let work = originalHeights.map(row => [...row]);
+
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (contourConstraintsMain[x][y] !== null) {
+                work[x][y] = contourConstraintsMain[x][y];
+                fixed[x][y] = true;
+            }
+        }
+    }
+
+    for (let i = 0; i < cleanPoints.length - 1; i++) {
+        const p1 = cleanPoints[i], p2 = cleanPoints[i + 1];
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const steps = Math.max(1, Math.ceil(dist / 0.5));
+        for (let s = 0; s <= steps; s++) {
+            const t = s / steps;
+            const px = p1.x + (p2.x - p1.x) * t;
+            const py = p1.y + (p2.y - p1.y) * t;
+            const gx = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(px / CELL_SIZE)));
+            const gy = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(py / CELL_SIZE)));
+            work[gx][gy] = targetHeight;
+            fixed[gx][gy] = true;
+        }
+    }
+
+    let insideMask = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+    if (isClosed && cleanPoints.length > 2) {
+        const polygon = cleanPoints.map(p => ({
+            x: p.x / CELL_SIZE,
+            y: p.y / CELL_SIZE
+        }));
+
+        const SUB = 4;
+        for (let x = 0; x < GRID_SIZE; x++) {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                if (fixed[x][y]) continue;
+
+                let insideCount = 0;
+                for (let si = 0; si < SUB; si++) {
+                    for (let sj = 0; sj < SUB; sj++) {
+                        const px = x + (si + 0.5) / SUB;
+                        const py = y + (sj + 0.5) / SUB;
+                        
+                        let inside = false;
+                        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                            const xi = polygon[i].x, yi = polygon[i].y;
+                            const xj = polygon[j].x, yj = polygon[j].y;
+                            const intersect = ((yi > py) !== (yj > py)) &&
+                                (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
+                            if (intersect) inside = !inside;
+                        }
+                        if (inside) insideCount++;
+                    }
+                }
+
+                if (insideCount >= (SUB * SUB) / 2) {
+                    insideMask[x][y] = true;
+                    work[x][y] = Math.max(work[x][y], targetHeight);
+                }
+            }
+        }
+    }
+
+    const distMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(Infinity));
+    const queue = [];
+
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (fixed[x][y] || insideMask[x][y]) {
+                distMap[x][y] = 0;
+                queue.push({x, y});
+            }
+        }
+    }
+
+    let head = 0;
+    while(head < queue.length) {
+        const curr = queue[head++];
+        const curD = distMap[curr.x][curr.y];
+        const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+        for(let d of dirs) {
+            const nx = curr.x + d.x, ny = curr.y + d.y;
+            if(nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
+                if(distMap[nx][ny] > curD + 1) {
+                    distMap[nx][ny] = curD + 1;
+                    queue.push({x: nx, y: ny});
+                }
+            }
+        }
+    }
+
+    const maxEffectDist = contourEffectDist;
+
+    for (let iter = 0; iter < 50; iter++) {
+        let maxDiff = 0;
+        for (let x = 0; x < GRID_SIZE; x++) {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                if (fixed[x][y]) continue;
+                if (distMap[x][y] >= maxEffectDist) continue;
+
+                const left  = x > 0 ? work[x - 1][y] : work[x][y];
+                const right = x < GRID_SIZE - 1 ? work[x + 1][y] : work[x][y];
+                const up    = y > 0 ? work[x][y - 1] : work[x][y];
+                const down  = y < GRID_SIZE - 1 ? work[x][y + 1] : work[x][y];
+                
+                const next = (left + right + up + down) * 0.25;
+                maxDiff = Math.max(maxDiff, Math.abs(next - work[x][y]));
+                work[x][y] = next;
+            }
+        }
+        if (maxDiff < 0.01) break;
+    }
+
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (fixed[x][y] || insideMask[x][y]) continue;
+            
+            const d = distMap[x][y];
+            if (d >= maxEffectDist) {
+                work[x][y] = originalHeights[x][y];
+            } else {
+                let t = d / maxEffectDist;
+                let weight = 1.0 - (t * t * (3 - 2 * t)); 
+                work[x][y] = work[x][y] * weight + originalHeights[x][y] * (1.0 - weight);
+            }
+        }
+    }
+
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (fixed[x][y]) {
+                contourConstraintsMain[x][y] = work[x][y];
+            }
+        }
+    }
+
+    heightMapMain = work;
+}
+
+function draw2DGeneric(ctx, heightMap, houseMap, activeStroke) {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    ctx.fillStyle = '#11161d';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    if (useElevationColor) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                if (heightMap[x][y] > 0) {
+                    const c = get2DElevationColor(heightMap[x][y]);
+                    ctx.fillStyle = `rgb(${c.r}, ${c.g}, ${c.b})`;
+                    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                }
+            }
+        }
+    }
+
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (houseMap[x][y]) {
+                ctx.fillStyle = '#dc3545'; 
+                ctx.fillRect(x * CELL_SIZE + 2, y * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+            }
+        }
+    }
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; 
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= GRID_SIZE; i++) {
+        ctx.beginPath(); ctx.moveTo(i * CELL_SIZE, 0); ctx.lineTo(i * CELL_SIZE, CANVAS_HEIGHT); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * CELL_SIZE); ctx.lineTo(CANVAS_WIDTH, i * CELL_SIZE); ctx.stroke();
+    }
+
+    drawAutoContoursFromHeightMap(ctx, heightMap);
+
+    if (isDrawing && activeStroke && activeStroke.length >= 2) {
+        if (currentSelectedHeight === 0) {
+            ctx.strokeStyle = '#ffffff';
+        } else {
+            const c = get2DElevationColor(currentSelectedHeight);
+            ctx.strokeStyle = `rgb(${c.r}, ${c.g}, ${c.b})`;
+        }
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(activeStroke[0].x, activeStroke[0].y);
+        for (let i = 1; i < activeStroke.length; i++) {
+            ctx.lineTo(activeStroke[i].x, activeStroke[i].y);
+        }
+        ctx.stroke();
+    }
+}
+
+function handleEnd() {
+    if (!isDrawing) return;
+    
+    isDrawing = false;
+    lastAppliedCell = { x: -1, y: -1 };
+
+    if (currentMode === 'drawContour' && currentStrokePoints.length >= 2) {
+        applyContourLineToHeightMap(currentStrokePoints, currentSelectedHeight);
+    }
+    currentStrokePoints = [];
+    draw2DMain();
+}
+
+function draw2DMain() {
+    const activeStroke = (isDrawing && currentMode === 'drawContour') ? currentStrokePoints : null;
+    draw2DGeneric(ctxMain, heightMapMain, houseMapMain, activeStroke);
+}
+
+function draw2DSub() {
+    draw2DGeneric(ctxSub, heightMapSub, houseMapSub, null);
+}
+
+function handleStart(clientX, clientY) {
+    if (mainViewMode === '3D') return;
+    const rect = canvas2dMain.getBoundingClientRect();
+    const x = (clientX - rect.left) / canvasScaleFactor;
+    const y = (clientY - rect.top) / canvasScaleFactor;
+
+    if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) return;
+
+    isDrawing = true;
+    saveHistory();
+
+    const gx = Math.floor(x / CELL_SIZE);
+    const gy = Math.floor(y / CELL_SIZE);
+    lastAppliedCell = { x: gx, y: gy };
+
+    if (currentMode === 'drawContour') {
+        currentStrokePoints = [{ x, y }];
+    } else if (currentMode === 'raiseHill') {
+        applyHillBrush(gx, gy);
+    } else if (currentMode === 'house') {
+        if (gx >= 0 && gx < GRID_SIZE && gy >= 0 && gy < GRID_SIZE) houseMapMain[gx][gy] = true;
+    } else if (currentMode === 'erase') {
+        applyEraseBrush(gx, gy);
+    }
+    draw2DMain();
+}
+
+function handleMove(clientX, clientY) {
+    if (!isDrawing || mainViewMode === '3D') return;
+    const rect = canvas2dMain.getBoundingClientRect();
+    const x = (clientX - rect.left) / canvasScaleFactor;
+    const y = (clientY - rect.top) / canvasScaleFactor;
+
+    const gx = Math.floor(x / CELL_SIZE);
+    const gy = Math.floor(y / CELL_SIZE);
+
+    if (currentMode === 'drawContour') {
+        currentStrokePoints.push({ x, y });
+    } else if (currentMode === 'raiseHill') {
+        if (gx !== lastAppliedCell.x || gy !== lastAppliedCell.y) {
+            applyHillBrush(gx, gy);
+            lastAppliedCell = { x: gx, y: gy };
+        }
+    } else if (currentMode === 'erase') {
+        if (gx !== lastAppliedCell.x || gy !== lastAppliedCell.y) {
+            applyEraseBrush(gx, gy);
+            lastAppliedCell = { x: gx, y: gy };
+        }
+    }
+    draw2DMain();
+}
+
+canvas2dMain.addEventListener('mousedown', (e) => handleStart(e.clientX, e.clientY));
+window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+window.addEventListener('mouseup', handleEnd);
+
+canvas2dMain.addEventListener('touchstart', (e) => {
+    handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault();
 }, { passive: false });
-canvas2d.addEventListener('touchmove', (e) => {
-    if (isDrawing) { editTerrain(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+canvas2dMain.addEventListener('touchmove', (e) => {
+    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault();
 }, { passive: false });
-canvas2d.addEventListener('touchend', () => { isDrawing = false; });
+canvas2dMain.addEventListener('touchend', handleEnd);
 
 init3D();
-draw2D();
+initElevationLegend();
+draw2DMain();
+adjustWorkspaceScale();
 </script>
 
 </body>
