@@ -12,7 +12,6 @@
             --bg-panel: #171d25;
             --bg-hover: #232b37;
             --primary: #28a745;
-            --primary-hover: #218838;
             --accent: #007bff;
             --text-main: #e1e6ed;
             --text-muted: #8a99ad;
@@ -131,6 +130,19 @@
             display: block;
         }
 
+        .eraser-menu-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 0;
+            flex: 0 0 16px;
+            vertical-align: middle;
+            background-image: url("data:image/png;base64,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");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 16px 16px;
+        }
+
         .menu-item {
             padding: 8px 16px;
             font-size: 0.82rem;
@@ -141,6 +153,11 @@
             cursor: pointer;
             transition: background 0.15s;
             position: relative;
+        }
+
+        .menu-item.eraser-item {
+            justify-content: flex-start;
+            gap: 0;
         }
 
         .menu-item:hover {
@@ -237,6 +254,23 @@
         .view-toggle-btn.btn-2d:hover { background-color: #4338ca; }
         .view-toggle-btn.btn-3d { background-color: #28a745; }
         .view-toggle-btn.btn-3d:hover { background-color: #218838; }
+        .display-toggle-btn {
+            color: #e8eef7;
+            background: #263243;
+            border: 1px solid #526176;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, box-shadow .15s;
+        }
+        .display-toggle-btn:hover { background: #3a4b61; border-color: #8da4c1; }
+        .display-toggle-btn.is-on { background: #087f8c; border-color: #5ee7ef; color: #fff; }
+        .display-toggle-btn.is-off { background: #303641; border-color: #596273; color: #d0d6df; }
+        .interval-toolbar-group { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .interval-toolbar-group label { color: var(--text-muted); font-size: 0.78rem; }
 
         .active-tool-badge {
             background-color: #1e2836;
@@ -266,6 +300,8 @@
             color: var(--text-muted);
             font-size: 0.78rem;
         }
+
+        #brushSizeSlider { width: 82px; min-width: 82px; }
 
         .control-select {
             background: #0f1319;
@@ -389,11 +425,58 @@
             position: relative;
             width: 440px;
             height: 440px;
-            border: 2px solid #232d3b;
+            border: 1px solid #232d3b;
             border-radius: 6px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             background-color: #1a1a1a;
             overflow: hidden;
+        }
+
+        /* メイン地形のワンタッチ編集ツール */
+        .main-tool-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-right: 8px;
+            padding: 6px 4px;
+            background: rgba(18, 23, 31, 0.96);
+            border: 1px solid #344154;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,.3);
+            flex: 0 0 auto;
+            align-self: flex-start;
+        }
+        .main-tool-button {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #526176;
+            border-radius: 7px;
+            background: #263243;
+            color: #f3f6fa;
+            font-size: 23px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #111720;
+            transition: background .12s, transform .12s, box-shadow .12s, border-color .12s;
+        }
+        .main-tool-button:hover { background: #3a4b61; border-color: #8da4c1; }
+        .main-tool-button.active {
+            background: #087f8c;
+            border-color: #5ee7ef;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,.48), 0 0 0 1px rgba(94,231,239,.28);
+            transform: translateY(2px);
+        }
+        .main-tool-button.danger { color: #ffb4b4; }
+        .main-tool-button.danger.active { background: #a52d36; border-color: #ff9a9a; }
+        .main-tool-button .eraser-menu-icon { width: 24px; height: 24px; flex-basis: 24px; background-size: 24px 24px; }
+        .main-tool-button[hidden] { display: none !important; }
+        @media (max-width: 600px) {
+            .main-tool-toolbar { gap: 5px; padding: 4px 3px; margin-right: 5px; }
+            .main-tool-button { width: 36px; height: 36px; font-size: 20px; }
         }
 
         /* 3D Operation Hint */
@@ -487,8 +570,32 @@
         }
 
         .terrainCanvasClass { z-index: 2; cursor: crosshair; }
+        .terrainCanvasClass.eraser-cursor, #threeCanvasMain.eraser-cursor { cursor: url("data:image/png;base64,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") 7 40, crosshair; }
         .threeCanvasClass { z-index: 1; display: none; cursor: grab; }
         .threeCanvasClass:active { cursor: grabbing; }
+
+        /* タッチ端末用：実際のマウスポインターがないため、
+           指の位置に消しゴムアイコンを表示する */
+        #eraserTouchIndicator {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            background: url("data:image/png;base64,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") no-repeat 0 0 / 48px 48px;
+            pointer-events: none;
+            z-index: 2147483647;
+            display: none;
+            transform: translate(-7px, -40px);
+            will-change: transform;
+        }
+
+        .guide-eraser-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 3px;
+            vertical-align: -3px;
+        }
 
         /* Right Side Tutorial Sidebar */
         .tutorial-sidebar {
@@ -749,11 +856,11 @@
                         <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                     </button>
                     <div class="dropdown-content">
-                        <div class="menu-item" onclick="handleModeSelection('drawContour')">❇ 等高線で作成</div>
-                        <div class="menu-item" id="menuItemBrush" onclick="handleModeSelection('raiseHill')">🖌 ブラシで作成</div>
+                        <div class="menu-item" id="menuItemBrush" onclick="handleModeSelection('raiseHill')">🖌️ ブラシで作成</div>
+                        <div class="menu-item" onclick="handleModeSelection('drawContour')">〰️ 等高線で作成</div>
                         <div class="menu-item" onclick="handleModeSelection('house')">🏠 家を建てる</div>
                         <div class="menu-divider"></div>
-                        <div class="menu-item" onclick="handleModeSelection('erase')">🧹 一部消しゴム</div>
+                        <div class="menu-item eraser-item" onclick="handleModeSelection('erase')"><span class="eraser-menu-icon" aria-hidden="true"></span><span>一部消しゴム</span></div>
                         <div class="menu-item danger" onclick="handleModeSelection('clearAll')">🗑 全消し</div>
                     </div>
                 </div>
@@ -774,6 +881,17 @@
                     </div>
                 </div>
 
+                <div class="dropdown" id="menuCopy">
+                    <button class="dropdown-btn" onclick="toggleDropdown('menuCopy')">
+                        📋 複写
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="menu-item" onclick="copyMainToSub()">📋 メインをサブに複製</div>
+                        <div class="menu-item disabled" id="menuItemSubToMain" onclick="applySubToMain()">🔄 サブをメインに反映</div>
+                    </div>
+                </div>
+
                 <div class="dropdown" id="menuFile">
                     <button class="dropdown-btn" onclick="toggleDropdown('menuFile')">
                         📁 ファイル
@@ -784,9 +902,6 @@
                         <div class="menu-item" onclick="openServerModal()">🌐 サーバー読み込み</div>
                         <div class="menu-divider"></div>
                         <div class="menu-item" onclick="saveToFile()">💾 保存 (JSON)</div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" onclick="copyMainToSub()">📋 メインをサブに複製</div>
-                        <div class="menu-item disabled" id="menuItemSubToMain" onclick="applySubToMain()">🔄 サブをメインに反映</div>
                     </div>
                 </div>
 
@@ -797,7 +912,12 @@
                         <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                     </button>
                     <div class="dropdown-content">
-                        <div class="menu-header">🌐 等高線手書き時の影響範囲</div>
+                        <div class="menu-header">▦ キャンバスのマス数</div>
+                        <div class="menu-item" onclick="setGridSize(40)" id="gridSize40"><span>40マス × 40マス</span><span class="check-mark">✓</span></div>
+                        <div class="menu-item" onclick="setGridSize(50)" id="gridSize50"><span>50マス × 50マス</span><span class="check-mark"></span></div>
+                        <div class="menu-item" onclick="setGridSize(60)" id="gridSize60"><span>60マス × 60マス</span><span class="check-mark"></span></div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-header">🌐 手書き時の影響範囲</div>
                         <div class="menu-item" onclick="setContourEffectDist(5, 'contourDistNarrow')" id="contourDistNarrow">
                             <span>狭い (範囲 5セル)</span> <span class="check-mark"></span>
                         </div>
@@ -809,14 +929,14 @@
                         </div>
                         <div class="menu-divider"></div>
                         <div class="menu-header">🖌 ブラシの高さ変化（盛り上がり度）</div>
-                        <div class="menu-item" onclick="setBrushStep(2, 'brushLevelWeak')" id="brushLevelWeak">
-                            <span>弱 (1回あたり +2m)</span> <span class="check-mark"></span>
+                        <div class="menu-item" onclick="setBrushStep(1, 'brushLevelWeak')" id="brushLevelWeak">
+                            <span>弱 (1回あたり +1m)</span> <span class="check-mark">✓</span>
                         </div>
-                        <div class="menu-item" onclick="setBrushStep(5, 'brushLevelMedium')" id="brushLevelMedium">
-                            <span>中 (1回あたり +5m)</span> <span class="check-mark">✓</span>
+                        <div class="menu-item" onclick="setBrushStep(2, 'brushLevelMedium')" id="brushLevelMedium">
+                            <span>中 (1回あたり +2m)</span> <span class="check-mark"></span>
                         </div>
-                        <div class="menu-item" onclick="setBrushStep(10, 'brushLevelStrong')" id="brushLevelStrong">
-                            <span>強 (1回あたり +10m)</span> <span class="check-mark"></span>
+                        <div class="menu-item" onclick="setBrushStep(5, 'brushLevelStrong')" id="brushLevelStrong">
+                            <span>強 (1回あたり +5m)</span> <span class="check-mark"></span>
                         </div>
                     </div>
                 </div>
@@ -827,7 +947,7 @@
                         <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                     </button>
                     <div class="dropdown-content">
-                        <div class="menu-item" onclick="openHelpPanel('tutorialTab', 'contour')">📖 チュートリアル</div>
+                        <div class="menu-item" onclick="openHelpPanel('tutorialTab', 'brush')">📖 チュートリアル</div>
                         <div class="menu-item" onclick="openHelpPanel('guideTab')">❓ 基本操作ガイド</div>
                         <div class="menu-divider"></div>
                         <div class="menu-item" onclick="alert('TerrainStudio v1.0')">ℹ️ バージョン情報 (v1.0)</div>
@@ -849,6 +969,7 @@
     <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)" style="display: none;">
 
     <div class="sub-toolbar">
+        <!-- 操作順：表示切替 → 等高線表示 → 標高色分け → 編集モード → ブラシサイズ → 等高線間隔 -->
         <div class="view-btn-group">
             <button class="view-toggle-btn btn-2d" id="mainViewBtn" onclick="toggleMainViewMode()">
                 🧊 メイン 2D
@@ -858,14 +979,27 @@
             </button>
         </div>
 
+        <button type="button" class="display-toggle-btn is-on" id="contourVisibilityBtn" onclick="toggleContourLine()" aria-pressed="true" title="等高線の表示を切り替え">等高線 ON</button>
+        <button type="button" class="display-toggle-btn is-off" id="elevationColorBtn" onclick="toggleElevationColor()" aria-pressed="false" title="標高の色分けを切り替え">標高の色分け OFF</button>
+
         <div class="active-tool-badge" id="activeToolText">
-            等高線で作成
+            ブラシで作成
         </div>
 
         <div class="control-group" id="brushSizeGroup" style="display: none;">
-            <label>ブラシサイズ:</label>
+            <label for="brushSizeSlider">ブラシサイズ:</label>
             <input type="range" id="brushSizeSlider" min="1" max="5" value="5" step="1" oninput="changeBrushRadius(this.value)">
             <span class="slider-val" id="brushSizeVal">5</span>
+        </div>
+
+        <div class="interval-toolbar-group" id="contourIntervalToolbarGroup">
+            <label for="contourIntervalSelect">等高線間隔:</label>
+            <select class="control-select" id="contourIntervalSelect" onchange="changeContourInterval(this.value)">
+                <option value="1">1m</option>
+                <option value="2">2m</option>
+                <option value="5">5m</option>
+                <option value="10" selected>10m</option>
+            </select>
         </div>
 
         <div class="control-group" id="inputHeightGroup">
@@ -877,16 +1011,6 @@
             <button class="btn-step" onclick="stepHeight(-10)">-</button>
             <button class="btn-step" onclick="stepHeight(10)">+</button>
         </div>
-
-        <div class="control-group">
-            <label>等高線の間隔:</label>
-            <select class="control-select" id="contourIntervalSelect" onchange="changeContourInterval(this.value)">
-                <option value="1">1m</option>
-                <option value="2">2m</option>
-                <option value="5">5m</option>
-                <option value="10" selected>10m</option>
-            </select>
-        </div>
     </div>
 
     <div class="workspace-container" id="workspaceContainer">
@@ -895,7 +1019,15 @@
                 <div class="canvas-card" id="mainCard">
                     <div class="card-title">【メイン地形】</div>
                     <div style="display: flex; align-items: flex-start;">
-                        <div class="canvas-container">
+                        <div class="main-tool-toolbar" id="mainToolToolbar" aria-label="メイン地形の編集ツール">
+                            <button type="button" class="main-tool-button" data-mode="raiseHill" title="ブラシで作成" aria-label="ブラシで作成" aria-pressed="false" onclick="handleModeSelection('raiseHill')">🖌️</button>
+                            <button type="button" class="main-tool-button" data-mode="drawContour" title="等高線で作成" aria-label="等高線で作成" aria-pressed="false" onclick="handleModeSelection('drawContour')">〰️</button>
+                            <button type="button" class="main-tool-button" data-mode="house" title="家を建てる" aria-label="家を建てる" aria-pressed="false" onclick="handleModeSelection('house')">🏠</button>
+                            <button type="button" class="main-tool-button" data-mode="erase" title="一部消しゴム" aria-label="一部消しゴム" aria-pressed="false" onclick="handleModeSelection('erase')"><span class="eraser-menu-icon" aria-hidden="true"></span></button>
+                            <button type="button" class="main-tool-button danger" data-mode="clearAll" title="全消し" aria-label="全消し" aria-pressed="false" onclick="handleModeSelection('clearAll')">🗑️</button>
+                        </div>
+                        <div class="canvas-container" id="mainCanvasContainer">
+                            <button id="resetMainViewButton" type="button" onclick="reset3DView('main')" style="display:none;position:absolute;top:8px;left:8px;z-index:20;padding:7px 10px;border:1px solid #667085;border-radius:6px;background:#fff;color:#222;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px #0004;">初期の向きに戻す</button>
                             <canvas id="terrainCanvasMain" class="terrainCanvasClass"></canvas>
                             <canvas id="threeCanvasMain" class="threeCanvasClass"></canvas>
                         </div>
@@ -915,7 +1047,9 @@
                 <div class="canvas-card" id="subCard">
                     <div class="card-title">【サブ地形】(読み込み用)</div>
                     <div style="display: flex; align-items: flex-start;">
-                        <div class="canvas-container">
+                        <div class="canvas-container" id="subCanvasContainer">
+                            <button id="resetSubViewButton" type="button" onclick="reset3DView('sub')" style="display:none;position:absolute;top:8px;right:8px;z-index:20;padding:7px 10px;border:1px solid #667085;border-radius:6px;background:#fff;color:#222;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px #0004;">初期の向きに戻す</button>
+                            <button id="linkMainToSubButton" type="button" onclick="toggleMainToSubLink()" style="display:none;position:absolute;top:8px;left:8px;z-index:20;padding:7px 10px;border:1px solid #667085;border-radius:6px;background:#fff;color:#222;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px #0004;">メイン地形に連動：OFF</button>
                             <canvas id="terrainCanvasSub" class="terrainCanvasClass"></canvas>
                             <canvas id="threeCanvasSub" class="threeCanvasClass"></canvas>
                         </div>
@@ -945,25 +1079,25 @@
 
             <!-- チュートリアル用のモード切り替えサブタブ -->
             <div class="tutorial-sub-tabs" id="tutorialSubTabs">
-                <button class="tutorial-sub-tab-btn active" id="subTabBtnContour" onclick="switchTutorialType('contour')">
-                    ✳ 等高線による入力
+                <button class="tutorial-sub-tab-btn active" id="subTabBtnBrush" onclick="switchTutorialType('brush')">
+                    🖌️ ブラシによる入力
                 </button>
-                <button class="tutorial-sub-tab-btn" id="subTabBtnBrush" onclick="switchTutorialType('brush')">
-                    🖌 ブラシによる入力
+                <button class="tutorial-sub-tab-btn" id="subTabBtnContour" onclick="switchTutorialType('contour')">
+                    〰️ 等高線による入力
                 </button>
             </div>
 
             <div class="tutorial-content-body">
                 <div id="tutorialTab">
                     <!-- 等高線チュートリアル -->
-                    <div id="tutorialContour">
+                    <div id="tutorialContour" style="display: none;">
                         <div class="tutorial-step-card">
                             <div class="tutorial-step-header">
                                 <span class="step-number">1</span>
                                 <span>山の裾野（すそ野）を作る</span>
                             </div>
                             <p>1. ツールバーの「入力標高」を <strong>10m</strong> に設定します。<br>
-                               2. モードを「❇ 等高線で作成」にし、キャンバス中央付近に大きめの円を描くようにくるっと線を繋げて閉じます。</p>
+                               2. モードを「〰️ 等高線で作成」にし、キャンバス中央付近に大きめの円を描くようにくるっと線を繋げて閉じます。</p>
                         </div>
 
                         <div class="tutorial-step-card">
@@ -996,7 +1130,7 @@
                     </div>
 
                     <!-- ブラシチュートリアル -->
-                    <div id="tutorialBrush" style="display: none;">
+                    <div id="tutorialBrush">
                         <div class="tutorial-step-card">
                             <div class="tutorial-step-header">
                                 <span class="step-number">1</span>
@@ -1036,30 +1170,48 @@
                 </div>
 
                 <div id="guideTab" style="display: none;">
-                    <div class="help-section-title">✏ 地形作成・編集機能</div>
+                    <div class="help-section-title">✏ 地形作成・編集</div>
                     <ul class="help-list">
-                        <li><strong>❇ 等高線で作成:</strong> ドラッグして線を引きます。始点と終点を繋いで輪を閉じると、その標高を境界条件として内側・外側が滑らかに補間されます。</li>
-                        <li><strong>🖌 ブラシで作成:</strong> なぞった箇所の高さを盛り上げます。（2Dのみ）</li>
-                        <li><strong>🏠 家を建てる:</strong> クリックすると家を設置できます。</li>
-                        <li><strong>🧹 一部消しゴム:</strong> なぞった箇所の高さを徐々に削り、家も消去します。</li>
+                        <li><strong>🖌️ ブラシで作成:</strong> 起動時の標準の入力方法です。2D表示の地形をドラッグして、なぞった場所を盛り上げます。ブラシサイズは上部のスライダーで調整できます。</li>
+                        <li><strong>〰️ 等高線で作成:</strong> メニューから選び、2Dキャンバス上で等高線を描きます。入力した線を地形の拘束条件として、線の間の地形が滑らかにつながるよう補間します。</li>
+                        <li><strong>🏠 家を建てる:</strong> このモードを選んでキャンバスをクリックすると、家を設置できます。</li>
+                        <li><strong><span class="eraser-menu-icon guide-eraser-icon" aria-hidden="true"></span>一部消しゴム:</strong> ドラッグした場所の地形の高さを削り、設置した家も消去できます。</li>
+                        <li><strong>🗑 全消し:</strong> 地形を全消去します。実行前に対象を確認してください。</li>
+                        <li><strong>入力標高:</strong> 上部の入力欄で標高を指定します。カラー凡例の色をクリックまたはドラッグして標高を選ぶこともできます。</li>
                     </ul>
 
-                    <div class="help-section-title">📊 標高の設定 & カラー凡例</div>
+                    <div class="help-section-title">👁 表示</div>
                     <ul class="help-list">
-                        <li><strong>入力標高:</strong> 0m〜100mの範囲で変更できます。</li>
-                        <li><strong>カラー凡例:</strong> 右側の色バーのドラッグやクリックで標高を選択可能です。</li>
+                        <li><strong>メイン 2D / サブ 2D:</strong> 各地形のボタンで2D表示と3D表示を切り替えます。メイン地形の編集は2D表示で行います。</li>
+                        <li><strong>二画面表示:</strong> メイン地形とサブ地形を並べて比較できます。メインとサブはそれぞれ2Dまたは3Dに切り替えられます。</li>
+                        <li><strong>等高線・標高の色分け:</strong> 「表示」メニューで、等高線の表示と標高に応じた色分けをそれぞれON/OFFできます。</li>
+                        <li><strong>3D視点:</strong> 左ドラッグで回転、マウスホイールでズーム、右ドラッグで平行移動します。「初期の向きに戻す」ボタンで視点を戻せます。</li>
                     </ul>
 
-                    <div class="help-section-title">🌐 3D表示 & 操作</div>
+                    <div class="help-section-title">📋 複写・連動</div>
                     <ul class="help-list">
-                        <li><strong>3Dモード切替:</strong> 「メイン 2D」ボタンで立体表示に切り替えます。</li>
-                        <li><strong>視点移動:</strong> 左ドラッグで回転、ホイールでズーム、右ドラッグで平行移動。</li>
+                        <li><strong>メインをサブに複製:</strong> メイン地形の内容をサブ地形にコピーします。</li>
+                        <li><strong>メイン地形に連動：ON/OFF:</strong> サブ地形の連動をONにすると、メイン地形の編集内容がサブ地形に反映されます。OFFにすると、サブ地形を独立して編集できます。</li>
+                        <li><strong>サブをメインに反映:</strong> サブ地形の内容をメイン地形に反映します。利用できない状態のときは、メニュー項目が無効表示になります。</li>
                     </ul>
 
-                    <div class="help-section-title">📱📱 二画面 & ファイル</div>
+                    <div class="help-section-title">⚙ 設定</div>
                     <ul class="help-list">
-                        <li><strong>二画面表示:</strong> メインとサブの比較や複製を行えます。</li>
-                        <li><strong>保存・読み込み:</strong> JSON形式でデータの保存やロードが可能です。</li>
+                        <li><strong>キャンバスのマス数:</strong> 「設定」メニューで40×40、50×50、60×60マスから選べます。作成途中に変更すると地形が初期化されるため、ご注意ください。</li>
+                        <li><strong>等高線手書き時の影響範囲:</strong> 等高線入力による地形補間の影響範囲を「狭い」「標準」「広い」から選べます。</li>
+                        <li><strong>ブラシの高さ変化:</strong> 1回あたりの盛り上がり度を「弱」「中」「強」から選べます。</li>
+                    </ul>
+
+                    <div class="help-section-title">📁 ファイル</div>
+                    <ul class="help-list">
+                        <li><strong>JSON読み込み:</strong> パソコンに保存したJSON形式の地形データを読み込みます。</li>
+                        <li><strong>サーバー読み込み:</strong> JSONファイルのURLを指定して、サーバー上の地形データを読み込みます。</li>
+                        <li><strong>保存（JSON）:</strong> 現在の地形データをJSON形式で保存します。</li>
+                    </ul>
+
+                    <div class="help-section-title">↶ 操作の取り消し</div>
+                    <ul class="help-list">
+                        <li>画面右上の「戻る」「進む」で、対応する編集操作を取り消したり、やり直したりできます。</li>
                     </ul>
                 </div>
             </div>
@@ -1089,10 +1241,16 @@
     </div>
 
 <script>
-const GRID_SIZE = 40;  
-const CELL_SIZE = 11;  
-const CANVAS_WIDTH = GRID_SIZE * CELL_SIZE; 
-const CANVAS_HEIGHT = GRID_SIZE * CELL_SIZE; 
+// 設定メニューで選択した格子数を使用する。キャンバスの表示サイズは常に440px。
+let GRID_SIZE = (() => {
+    try {
+        const saved = Number(localStorage.getItem('terrainStudioGridSize'));
+        return [40, 50, 60].includes(saved) ? saved : 40;
+    } catch (_) { return 40; }
+})();
+const CANVAS_WIDTH = 440;
+const CANVAS_HEIGHT = 440;
+let CELL_SIZE = CANVAS_WIDTH / GRID_SIZE;
 const MAX_HEIGHT = 100;
 
 let heightMapMain = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(0));
@@ -1101,7 +1259,9 @@ let houseMapMain = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).
 
 let heightMapSub = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(0));
 let houseMapSub = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)); 
-let isSubTerrainLoaded = false; 
+let isSubTerrainLoaded = false;
+let linkMainToSub = false; // ONのとき、メイン地形の更新をサブ地形に反映
+
 
 let historyStack = [];
 let redoStack = [];
@@ -1109,13 +1269,15 @@ const MAX_HISTORY = 10;
 
 let currentSelectedHeight = 10; 
 let currentBrushRadius = 4;
-let brushStep = 5; 
+let brushStep = 1; 
 let contourEffectDist = 10; 
 
 let isDrawing = false;
+let is3DEraserDrawing = false;
+let last3DEraseCell = { x: -1, y: -1 };
 let lastAppliedCell = { x: -1, y: -1 }; 
 let currentStrokePoints = [];
-let currentMode = 'drawContour'; 
+let currentMode = 'raiseHill'; 
 let pendingMode = null; 
 
 let mainViewMode = '2D'; 
@@ -1139,8 +1301,9 @@ canvas2dSub.width = CANVAS_WIDTH; canvas2dSub.height = CANVAS_HEIGHT;
 const canvas3dSub = document.getElementById('threeCanvasSub');
 canvas3dSub.width = CANVAS_WIDTH; canvas3dSub.height = CANVAS_HEIGHT;
 
-let sceneMain, cameraMain, rendererMain, terrainMeshMain, customMaterialMain, controlsMain;
-let sceneSub, cameraSub, rendererSub, terrainMeshSub, customMaterialSub, controlsSub;
+let sceneMain, cameraMain, rendererMain, terrainMeshMain, customMaterialMain, controlsMain, dirLightMain;
+let sceneSub, cameraSub, rendererSub, terrainMeshSub, customMaterialSub, controlsSub, dirLightSub;
+let edgeLinesMain = [], edgeLinesSub = [];
 
 let houseGroupsMain = [];
 let houseGroupsSub = [];
@@ -1218,7 +1381,7 @@ function setBrushStep(stepVal, selectedId) {
     });
 }
 
-function openHelpPanel(tabId, tutorialType = 'contour') {
+function openHelpPanel(tabId, tutorialType = 'brush') {
     closeAllDropdowns();
     const panel = document.getElementById('helpPanel');
     panel.classList.remove('hidden');
@@ -1422,7 +1585,28 @@ function updateLegendPointer() {
 
 function handleModeSelection(mode) {
     closeAllDropdowns();
-    if (mainViewMode === '3D') {
+    // 全消しは確認付きの一回操作。実行後は選択ツールを解除する。
+    if (mode === 'clearAll') {
+        if (mainViewMode === '3D') {
+            pendingMode = mode;
+            document.getElementById('editWarningModal').style.display = 'flex';
+            return;
+        }
+        clearAll();
+        setMode(null);
+        return;
+    }
+    // 選択中の同じボタンを再度押すと編集モードを解除する。
+    if (currentMode === mode) {
+        if (mainViewMode === '3D' && mode === 'erase') {
+            cancel3DEraserMode();
+        } else {
+            setMode(null);
+        }
+        return;
+    }
+    // 3Dでは一部消しゴムだけを使用可能にする。
+    if (mainViewMode === '3D' && mode !== 'erase') {
         pendingMode = mode;
         document.getElementById('editWarningModal').style.display = 'flex';
         return;
@@ -1436,11 +1620,16 @@ function closeEditWarningModal() {
 }
 
 function confirmSwitchTo2DAndEdit() {
+    const mode = pendingMode;
     closeEditWarningModal();
     toggleMainViewMode();
-    if (pendingMode) {
-        executeMode(pendingMode);
-        pendingMode = null;
+    if (mode) {
+        if (mode === 'clearAll') {
+            clearAll();
+            setMode(null);
+        } else {
+            executeMode(mode);
+        }
     }
 }
 
@@ -1450,6 +1639,77 @@ function executeMode(mode) {
     } else {
         setMode(mode);
     }
+}
+
+// ===== 消しゴムカーソル =====
+const ERASER_CURSOR_DATA_URL = "data:image/png;base64,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";
+let eraserTouchIndicator = null;
+
+function ensureEraserTouchIndicator() {
+    if (eraserTouchIndicator) return eraserTouchIndicator;
+    eraserTouchIndicator = document.createElement('div');
+    eraserTouchIndicator.id = 'eraserTouchIndicator';
+    eraserTouchIndicator.setAttribute('aria-hidden', 'true');
+    eraserTouchIndicator.style.backgroundImage = `url("${ERASER_CURSOR_DATA_URL}")`;
+    document.body.appendChild(eraserTouchIndicator);
+    return eraserTouchIndicator;
+}
+
+function updateEraserCursor() {
+    const canvas = document.getElementById('terrainCanvasMain');
+    if (!canvas) return;
+    canvas.classList.toggle('eraser-cursor', currentMode === 'erase' && mainViewMode === '2D');
+    if (typeof canvas3dMain !== 'undefined' && canvas3dMain) {
+        canvas3dMain.classList.toggle('eraser-cursor', currentMode === 'erase' && mainViewMode === '3D');
+    }
+    update3DEraserCancelButton();
+}
+
+function cancel3DEraserMode() {
+    if (mainViewMode !== '3D' || currentMode !== 'erase') return;
+    is3DEraserDrawing = false;
+    last3DEraseCell = { x: -1, y: -1 };
+    setMode(null);
+    update3DEraserCancelButton();
+}
+
+function update3DEraserCancelButton() {
+    let button = document.getElementById('cancel3DEraserButton');
+    const active = mainViewMode === '3D' && currentMode === 'erase';
+    if (active && !button) {
+        button = document.createElement('button');
+        button.id = 'cancel3DEraserButton';
+        button.type = 'button';
+        button.textContent = '✕ 一部消しゴムを終了';
+        button.style.cssText = 'position:fixed;right:24px;top:82px;z-index:10000;background:#fff;border:2px solid #555;border-radius:8px;padding:9px 13px;font-size:14px;box-shadow:0 2px 8px #0004;cursor:pointer;';
+        button.addEventListener('click', cancel3DEraserMode);
+        document.body.appendChild(button);
+    } else if (!active && button) {
+        button.remove();
+    }
+}
+
+function updateEraserTouchIndicator(clientX, clientY, visible = true) {
+    const indicator = ensureEraserTouchIndicator();
+    if (currentMode !== 'erase' || mainViewMode !== '2D' || !visible) {
+        indicator.style.display = 'none';
+        return;
+    }
+    indicator.style.display = 'block';
+    indicator.style.transform = `translate(${clientX - 7}px, ${clientY - 40}px)`;
+}
+
+function updateMainToolButtons() {
+    const toolbar = document.getElementById('mainToolToolbar');
+    if (!toolbar) return;
+    toolbar.querySelectorAll('.main-tool-button').forEach(button => {
+        const mode = button.dataset.mode;
+        const visible = mainViewMode === '2D' || mode === 'erase';
+        button.hidden = !visible;
+        const active = mode !== 'clearAll' && currentMode === mode;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
 }
 
 function setMode(mode) {
@@ -1474,7 +1734,18 @@ function setMode(mode) {
         badge.textContent = '一部消しゴム';
         brushGroup.style.display = 'none';
         inputHeightGroup.style.display = 'flex';
+    } else {
+        badge.textContent = '編集モードなし';
+        brushGroup.style.display = 'none';
+        inputHeightGroup.style.display = 'none';
     }
+
+    updateMainToolButtons();
+    updateEraserCursor();
+    updateEraserTouchIndicator(0, 0, false);
+    // 一部消しゴム中は3D地形を編集できるようにし、視点回転操作との競合を防ぐ。
+    if (controlsMain) controlsMain.enabled = !(mainViewMode === '3D' && currentMode === 'erase');
+    canvas3dMain.style.cursor = (mainViewMode === '3D' && currentMode === 'erase') ? '' : 'grab';
 
     if (mainViewMode === '2D') draw2DMain(); else sync2DTo3DMain();
 }
@@ -1501,15 +1772,45 @@ function closeServerModal() {
 function setSubTerrainLoadedState(loaded) {
     isSubTerrainLoaded = loaded;
     const menuItem = document.getElementById('menuItemSubToMain');
-    if (loaded) {
-        menuItem.classList.remove('disabled');
-    } else {
-        menuItem.classList.add('disabled');
+    if (menuItem) {
+        if (loaded) menuItem.classList.remove('disabled');
+        else menuItem.classList.add('disabled');
     }
+    const button = document.getElementById('linkMainToSubButton');
+    if (button) button.style.display = loaded ? 'block' : 'none';
+    updateMainToSubLinkButton();
+}
+
+function updateMainToSubLinkButton() {
+    const button = document.getElementById('linkMainToSubButton');
+    if (!button) return;
+    button.textContent = `メイン地形に連動：${linkMainToSub ? 'ON' : 'OFF'}`;
+    button.style.background = linkMainToSub ? '#d1fae5' : '#fff';
+    button.style.borderColor = linkMainToSub ? '#059669' : '#667085';
+    button.title = linkMainToSub
+        ? '連動中：メイン地形の編集がサブ地形に反映されます。クリックでOFF'
+        : '連動OFF：メイン地形を編集してもサブ地形は変化しません。クリックでON';
+}
+
+function toggleMainToSubLink() {
+    if (!isSubTerrainLoaded) return;
+    linkMainToSub = !linkMainToSub;
+    if (linkMainToSub) refreshSubFromMainIfLinked(true);
+    updateMainToSubLinkButton();
+}
+
+function refreshSubFromMainIfLinked(force = false) {
+    if (!isSubTerrainLoaded || (!linkMainToSub && !force)) return;
+    // 2D/3Dの表示モードにかかわらず、地形データだけを同期して表示を更新する。
+    heightMapSub = heightMapMain.map(row => [...row]);
+    houseMapSub = houseMapMain.map(row => [...row]);
+    if (subViewMode === '2D') draw2DSub();
+    else if (sceneSub && terrainMeshSub) sync2DTo3DSub();
 }
 
 function applyTerrainDataToSub(data) {
     if (data.gridSize === GRID_SIZE) {
+        linkMainToSub = false;
         if (data.heightMap) {
             heightMapSub = data.heightMap.map(row => [...row]);
         } else if (data.hillBrushMap) {
@@ -1566,8 +1867,9 @@ function copyMainToSub() {
     closeAllDropdowns();
     heightMapSub = heightMapMain.map(row => [...row]);
     houseMapSub = houseMapMain.map(row => [...row]);
-    
+    linkMainToSub = true;
     setSubTerrainLoadedState(true);
+    updateMainToSubLinkButton();
 
     if (!isDualScreen) {
         toggleScreenLayout();
@@ -1697,9 +1999,13 @@ function create3DScene(canvas) {
     controls.enableDamping = true; 
     controls.dampingFactor = 0.05;
 
+    // 視点の向きに合わせて照明も移動する。ライトをカメラ位置に置き、
+    // OrbitControls の注視点を照射先にすることで、ドラッグ中も正面側から照らす。
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    dirLight.position.set(1, 2, 1).normalize();
-    scene.add(dirLight); 
+    dirLight.position.copy(camera.position);
+    dirLight.target.position.copy(controls.target);
+    scene.add(dirLight);
+    scene.add(dirLight.target);
     scene.add(new THREE.AmbientLight(0x666666));
 
     const geometry = new THREE.PlaneGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
@@ -1744,15 +2050,32 @@ function create3DScene(canvas) {
     const terrainMesh = new THREE.Mesh(geometry, customMaterial);
     scene.add(terrainMesh);
 
-    return { scene, camera, renderer, controls, terrainMesh, customMaterial };
+    // 2Dキャンバスの四辺と同じ色で、3D地形の四辺を識別
+    const edgeSpecs = [
+        { color: 0xff4d4f, points: (h) => [[0, h[0][0]*0.12 + 0.08, 0], [GRID_SIZE-1, h[GRID_SIZE-1][0]*0.12 + 0.08, 0]] },
+        { color: 0x409eff, points: (h) => [[GRID_SIZE-1, h[GRID_SIZE-1][0]*0.12 + 0.08, 0], [GRID_SIZE-1, h[GRID_SIZE-1][GRID_SIZE-1]*0.12 + 0.08, GRID_SIZE-1]] },
+        { color: 0x35c759, points: (h) => [[GRID_SIZE-1, h[GRID_SIZE-1][GRID_SIZE-1]*0.12 + 0.08, GRID_SIZE-1], [0, h[0][GRID_SIZE-1]*0.12 + 0.08, GRID_SIZE-1]] },
+        { color: 0xff9f0a, points: (h) => [[0, h[0][GRID_SIZE-1]*0.12 + 0.08, GRID_SIZE-1], [0, h[0][0]*0.12 + 0.08, 0]] }
+    ];
+    const edgeLines = edgeSpecs.map(spec => {
+        const geom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(1,0,0)]);
+        const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: spec.color, linewidth: 3 }));
+        line.userData.edgeSpec = spec;
+        scene.add(line);
+        return line;
+    });
+
+    return { scene, camera, renderer, controls, terrainMesh, customMaterial, edgeLines, dirLight };
 }
 
 function init3D() {
     const m = create3DScene(canvas3dMain);
-    sceneMain = m.scene; cameraMain = m.camera; rendererMain = m.renderer; controlsMain = m.controls; terrainMeshMain = m.terrainMesh; customMaterialMain = m.customMaterial;
+    sceneMain = m.scene; cameraMain = m.camera; rendererMain = m.renderer; controlsMain = m.controls; terrainMeshMain = m.terrainMesh; customMaterialMain = m.customMaterial; edgeLinesMain = m.edgeLines; dirLightMain = m.dirLight;
+    controlsMain.saveState();
 
     const s = create3DScene(canvas3dSub);
-    sceneSub = s.scene; cameraSub = s.camera; rendererSub = s.renderer; controlsSub = s.controls; terrainMeshSub = s.terrainMesh; customMaterialSub = s.customMaterial;
+    sceneSub = s.scene; cameraSub = s.camera; rendererSub = s.renderer; controlsSub = s.controls; terrainMeshSub = s.terrainMesh; customMaterialSub = s.customMaterial; edgeLinesSub = s.edgeLines; dirLightSub = s.dirLight;
+    controlsSub.saveState();
 }
 
 function sync2DTo3DGeneric(heightMap, houseMap, terrainMesh, customMaterial, scene, grpHouse) {
@@ -1776,7 +2099,28 @@ function sync2DTo3DGeneric(heightMap, houseMap, terrainMesh, customMaterial, sce
     terrainMesh.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     position.needsUpdate = true;
     terrainMesh.geometry.attributes.color.needsUpdate = true;
-    terrainMesh.geometry.computeVertexNormals(); 
+    terrainMesh.geometry.computeVertexNormals();
+
+    // 地形の標高に追従する色付きの外周線を更新
+    const edges = scene === sceneMain ? edgeLinesMain : edgeLinesSub;
+    const edgePoints = [
+        Array.from({length: GRID_SIZE}, (_, x) => [x, heightMap[x][0]]),
+        Array.from({length: GRID_SIZE}, (_, z) => [GRID_SIZE-1, heightMap[GRID_SIZE-1][z]]),
+        Array.from({length: GRID_SIZE}, (_, i) => [GRID_SIZE-1-i, heightMap[GRID_SIZE-1-i][GRID_SIZE-1]]),
+        Array.from({length: GRID_SIZE}, (_, i) => [0, heightMap[0][GRID_SIZE-1-i]])
+    ];
+    edges.forEach((line, edgeIndex) => {
+        // PlaneGeometry は幅・奥行きが GRID_SIZE で、頂点間隔は GRID_SIZE/(GRID_SIZE-1)。
+        // そのため、配列インデックスをそのまま座標にすると外周線が1目盛り弱内側にずれる。
+        // 地形メッシュの実際の頂点座標に合わせて、外周線を0～GRID_SIZEへ配置する。
+        const scale = GRID_SIZE / (GRID_SIZE - 1);
+        const pts = edgePoints[edgeIndex].map(([x, h], i) => {
+            const zIndex = edgeIndex === 0 ? 0 : edgeIndex === 1 ? i : edgeIndex === 2 ? GRID_SIZE-1 : GRID_SIZE-1-i;
+            return new THREE.Vector3(x * scale, h * 0.12 + 0.08, zIndex * scale);
+        });
+        line.geometry.dispose();
+        line.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+    });
 
     if (customMaterial.userData.shader) { 
         customMaterial.userData.shader.uniforms.uShowContour.value = showContour3D; 
@@ -1805,7 +2149,10 @@ function sync2DTo3DGeneric(heightMap, houseMap, terrainMesh, customMaterial, sce
     }
 }
 
-function sync2DTo3DMain() { sync2DTo3DGeneric(heightMapMain, houseMapMain, terrainMeshMain, customMaterialMain, sceneMain, houseGroupsMain); }
+function sync2DTo3DMain() {
+    sync2DTo3DGeneric(heightMapMain, houseMapMain, terrainMeshMain, customMaterialMain, sceneMain, houseGroupsMain);
+    refreshSubFromMainIfLinked();
+}
 function sync2DTo3DSub() { sync2DTo3DGeneric(heightMapSub, houseMapSub, terrainMeshSub, customMaterialSub, sceneSub, houseGroupsSub); }
 
 function animate3D() {
@@ -1813,16 +2160,41 @@ function animate3D() {
     requestAnimationFrame(animate3D);
 
     if (mainViewMode === '3D') {
-        controlsMain.update(); rendererMain.render(sceneMain, cameraMain);
+        controlsMain.update();
+        // カメラの位置と注視点を毎フレーム照明へ反映（ドラッグ・慣性回転に追従）
+        dirLightMain.position.copy(cameraMain.position);
+        dirLightMain.target.position.copy(controlsMain.target);
+        rendererMain.render(sceneMain, cameraMain);
     }
     if (isDualScreen && subViewMode === '3D') {
-        controlsSub.update(); rendererSub.render(sceneSub, cameraSub);
+        controlsSub.update();
+        dirLightSub.position.copy(cameraSub.position);
+        dirLightSub.target.position.copy(controlsSub.target);
+        rendererSub.render(sceneSub, cameraSub);
+    }
+}
+
+function updateDisplayToggleButtons() {
+    const contourBtn = document.getElementById('contourVisibilityBtn');
+    if (contourBtn) {
+        contourBtn.textContent = `等高線 ${showContour2D ? 'ON' : 'OFF'}`;
+        contourBtn.classList.toggle('is-on', showContour2D);
+        contourBtn.classList.toggle('is-off', !showContour2D);
+        contourBtn.setAttribute('aria-pressed', showContour2D ? 'true' : 'false');
+    }
+    const colorBtn = document.getElementById('elevationColorBtn');
+    if (colorBtn) {
+        colorBtn.textContent = `標高の色分け ${useElevationColor ? 'ON' : 'OFF'}`;
+        colorBtn.classList.toggle('is-on', useElevationColor);
+        colorBtn.classList.toggle('is-off', !useElevationColor);
+        colorBtn.setAttribute('aria-pressed', useElevationColor ? 'true' : 'false');
     }
 }
 
 function toggleElevationColor() {
     useElevationColor = !useElevationColor;
     document.getElementById('menuItemColor').textContent = `標高の色分け: ${useElevationColor ? 'ON' : 'OFF'}`;
+    updateDisplayToggleButtons();
     closeAllDropdowns();
     
     updateLegendVisibility();
@@ -1836,6 +2208,7 @@ function toggleContourLine() {
     showContour3D = !showContour3D;
     showContour2D = !showContour2D;
     document.getElementById('menuItemContour').textContent = `等高線: ${showContour2D ? 'ON' : 'OFF'}`;
+    updateDisplayToggleButtons();
 
     if (mainViewMode === '3D') sync2DTo3DMain(); else draw2DMain();
     if (subViewMode === '3D') sync2DTo3DSub(); else draw2DSub();
@@ -1892,6 +2265,20 @@ function toggleScreenLayout() {
     adjustWorkspaceScale();
 }
 
+function reset3DView(which) {
+    const controls = which === 'sub' ? controlsSub : controlsMain;
+    if (!controls) return;
+    controls.reset();
+    controls.update();
+}
+
+function updateResetViewButtons() {
+    const mainButton = document.getElementById('resetMainViewButton');
+    const subButton = document.getElementById('resetSubViewButton');
+    if (mainButton) mainButton.style.display = mainViewMode === '3D' ? 'block' : 'none';
+    if (subButton) subButton.style.display = subViewMode === '3D' ? 'block' : 'none';
+}
+
 function toggleMainViewMode() {
     const btn = document.getElementById('mainViewBtn');
     const menuItem = document.getElementById('menuItemMainViewMode');
@@ -1927,8 +2314,12 @@ function toggleMainViewMode() {
         draw2DMain();
     }
 
+    if (controlsMain) controlsMain.enabled = !(mainViewMode === '3D' && currentMode === 'erase');
+    canvas3dMain.style.cursor = (mainViewMode === '3D' && currentMode === 'erase') ? '' : 'grab';
     updateLegendVisibility();
     updateHistoryButtons();
+    updateResetViewButtons();
+    updateMainToolButtons();
 }
 
 function toggleSubViewMode() {
@@ -1958,6 +2349,7 @@ function toggleSubViewMode() {
         
         draw2DSub();
     }
+    updateResetViewButtons();
 }
 
 function clearAll() {
@@ -2105,162 +2497,136 @@ function applyEraseBrush(centerX, centerY) {
 }
 
 function applyContourLineToHeightMap(points, targetHeight) {
-    if (points.length < 2) return;
+    if (!points || points.length < 2) return;
 
-    const cleanPoints = points.map(p => ({x: p.x, y: p.y}));
-    const isClosed = Math.hypot(
-        cleanPoints[0].x - cleanPoints[cleanPoints.length - 1].x,
-        cleanPoints[0].y - cleanPoints[cleanPoints.length - 1].y
-    ) < 30;
-
-    if (isClosed) {
-        const a = cleanPoints[cleanPoints.length - 1];
-        const b = cleanPoints[0];
-        if (Math.hypot(a.x - b.x, a.y - b.y) > 0.5) cleanPoints.push({...b});
+    // 手書き線を閉じ、グリッド上の等高線境界として登録する。
+    const cleanPoints = points.map(p => ({ x: p.x, y: p.y }));
+    const first = cleanPoints[0];
+    const last = cleanPoints[cleanPoints.length - 1];
+    if (first.x !== last.x || first.y !== last.y) {
+        cleanPoints.push({ x: first.x, y: first.y });
     }
 
-    const fixed = Array.from(
-        { length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false)
-    );
-    
-    let originalHeights = heightMapMain.map(row => row.map(v =>
+    const original = heightMapMain.map(row => row.map(v =>
         Number.isFinite(v) ? Math.max(0, Math.min(MAX_HEIGHT, v)) : 0
     ));
-    
-    let work = originalHeights.map(row => [...row]);
+    const work = original.map(row => [...row]);
+    const fixed = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
+    const insideMask = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
 
+    // 既存の手書き等高線を固定境界として維持する。
     for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
-            if (contourConstraintsMain[x][y] !== null) {
+            if (contourConstraintsMain[x][y] !== null && Number.isFinite(contourConstraintsMain[x][y])) {
                 work[x][y] = contourConstraintsMain[x][y];
                 fixed[x][y] = true;
             }
         }
     }
 
+    // 今回描いた線をサンプリングし、線幅1セルの固定境界にする。
     for (let i = 0; i < cleanPoints.length - 1; i++) {
-        const p1 = cleanPoints[i], p2 = cleanPoints[i + 1];
-        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-        const steps = Math.max(1, Math.ceil(dist / 0.5));
-        for (let s = 0; s <= steps; s++) {
-            const t = s / steps;
-            const px = p1.x + (p2.x - p1.x) * t;
-            const py = p1.y + (p2.y - p1.y) * t;
-            const gx = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(px / CELL_SIZE)));
-            const gy = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(py / CELL_SIZE)));
+        const a = cleanPoints[i], b = cleanPoints[i + 1];
+        const dist = Math.hypot(b.x - a.x, b.y - a.y);
+        const steps = Math.max(1, Math.ceil(dist / (CELL_SIZE * 0.35)));
+        for (let k = 0; k <= steps; k++) {
+            const t = k / steps;
+            const px = a.x + (b.x - a.x) * t;
+            const py = a.y + (b.y - a.y) * t;
+            const gx = Math.max(0, Math.min(GRID_SIZE - 1, Math.round(px / CELL_SIZE)));
+            const gy = Math.max(0, Math.min(GRID_SIZE - 1, Math.round(py / CELL_SIZE)));
             work[gx][gy] = targetHeight;
             fixed[gx][gy] = true;
         }
     }
 
-    let insideMask = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(false));
-    if (isClosed && cleanPoints.length > 2) {
-        const polygon = cleanPoints.map(p => ({
-            x: p.x / CELL_SIZE,
-            y: p.y / CELL_SIZE
-        }));
-
-        const SUB = 4;
-        for (let x = 0; x < GRID_SIZE; x++) {
-            for (let y = 0; y < GRID_SIZE; y++) {
-                if (fixed[x][y]) continue;
-
-                let insideCount = 0;
-                for (let si = 0; si < SUB; si++) {
-                    for (let sj = 0; sj < SUB; sj++) {
-                        const px = x + (si + 0.5) / SUB;
-                        const py = y + (sj + 0.5) / SUB;
-                        
-                        let inside = false;
-                        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-                            const xi = polygon[i].x, yi = polygon[i].y;
-                            const xj = polygon[j].x, yj = polygon[j].y;
-                            const intersect = ((yi > py) !== (yj > py)) &&
-                                (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
-                            if (intersect) inside = !inside;
-                        }
-                        if (inside) insideCount++;
-                    }
-                }
-
-                if (insideCount >= (SUB * SUB) / 2) {
-                    insideMask[x][y] = true;
-                    work[x][y] = Math.max(work[x][y], targetHeight);
-                }
-            }
-        }
-    }
-
-    const distMap = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(Infinity));
-    const queue = [];
-
+    // 閉じた線の内側を判定。内側は少なくとも今回の等高線標高にする。
+    const polygon = cleanPoints.map(p => ({ x: p.x / CELL_SIZE, y: p.y / CELL_SIZE }));
     for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
-            if (fixed[x][y] || insideMask[x][y]) {
-                distMap[x][y] = 0;
-                queue.push({x, y});
-            }
-        }
-    }
-
-    let head = 0;
-    while(head < queue.length) {
-        const curr = queue[head++];
-        const curD = distMap[curr.x][curr.y];
-        const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
-        for(let d of dirs) {
-            const nx = curr.x + d.x, ny = curr.y + d.y;
-            if(nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
-                if(distMap[nx][ny] > curD + 1) {
-                    distMap[nx][ny] = curD + 1;
-                    queue.push({x: nx, y: ny});
+            if (fixed[x][y]) continue;
+            const px = x + 0.5, py = y + 0.5;
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].x, yi = polygon[i].y;
+                const xj = polygon[j].x, yj = polygon[j].y;
+                if (((yi > py) !== (yj > py)) &&
+                    (px < (xj - xi) * (py - yi) / ((yj - yi) || 1e-12) + xi)) {
+                    inside = !inside;
                 }
             }
+            if (inside) {
+                insideMask[x][y] = true;
+                work[x][y] = Math.max(work[x][y], targetHeight);
+            }
         }
     }
 
-    const maxEffectDist = contourEffectDist;
+    // 4近傍距離場：各セルから最寄りの固定等高線までの距離を求める。
+    const distance = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(Infinity));
+    const queue = [];
+    for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            if (fixed[x][y]) {
+                distance[x][y] = 0;
+                queue.push({ x, y });
+            }
+        }
+    }
+    let head = 0;
+    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+    while (head < queue.length) {
+        const c = queue[head++];
+        for (const [dx, dy] of dirs) {
+            const nx = c.x + dx, ny = c.y + dy;
+            if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) continue;
+            if (distance[nx][ny] > distance[c.x][c.y] + 1) {
+                distance[nx][ny] = distance[c.x][c.y] + 1;
+                queue.push({ x: nx, y: ny });
+            }
+        }
+    }
 
-    for (let iter = 0; iter < 50; iter++) {
+    // 距離に応じた滑らか補間。
+    // 隣接する等高線が近い場所では標高変化が急になり、離れた場所では緩やかになる。
+    // 固定境界は変更せず、反復的なラプラス補間で等高線間を滑らかにつなぐ。
+    const influence = Math.max(3, Number(contourEffectDist) || 10);
+    const seed = work.map(row => [...row]);
+    const maxIterations = 700;
+    for (let iter = 0; iter < maxIterations; iter++) {
         let maxDiff = 0;
         for (let x = 0; x < GRID_SIZE; x++) {
             for (let y = 0; y < GRID_SIZE; y++) {
                 if (fixed[x][y]) continue;
-                if (distMap[x][y] >= maxEffectDist) continue;
-
+                // 等高線から十分離れた領域は元の地形を保ち、境界付近のみを補間する。
+                if (distance[x][y] >= influence && !insideMask[x][y]) continue;
                 const left  = x > 0 ? work[x - 1][y] : work[x][y];
                 const right = x < GRID_SIZE - 1 ? work[x + 1][y] : work[x][y];
                 const up    = y > 0 ? work[x][y - 1] : work[x][y];
                 const down  = y < GRID_SIZE - 1 ? work[x][y + 1] : work[x][y];
-                
-                const next = (left + right + up + down) * 0.25;
+                const average = (left + right + up + down) * 0.25;
+                // 元の地形を遠方の基準値として残し、境界からの距離に応じて影響を弱める。
+                const d = distance[x][y];
+                const t = Math.min(1, d / influence);
+                const smooth = t * t * (3 - 2 * t);
+                const anchorWeight = insideMask[x][y] ? 0 : 0.035 * smooth;
+                const next = average * (1 - anchorWeight) + original[x][y] * anchorWeight;
                 maxDiff = Math.max(maxDiff, Math.abs(next - work[x][y]));
                 work[x][y] = next;
             }
         }
-        if (maxDiff < 0.01) break;
+        if (maxDiff < 0.005) break;
     }
 
-    for (let x = 0; x < GRID_SIZE; x++) {
-        for (let y = 0; y < GRID_SIZE; y++) {
-            if (fixed[x][y] || insideMask[x][y]) continue;
-            
-            const d = distMap[x][y];
-            if (d >= maxEffectDist) {
-                work[x][y] = originalHeights[x][y];
-            } else {
-                let t = d / maxEffectDist;
-                let weight = 1.0 - (t * t * (3 - 2 * t)); 
-                work[x][y] = work[x][y] * weight + originalHeights[x][y] * (1.0 - weight);
-            }
-        }
-    }
-
+    // 内側は今回の高さを下回らないようにしつつ、より高い既存等高線は保持する。
     for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
             if (fixed[x][y]) {
                 contourConstraintsMain[x][y] = work[x][y];
+            } else if (insideMask[x][y]) {
+                work[x][y] = Math.max(targetHeight, work[x][y]);
             }
+            work[x][y] = Math.max(0, Math.min(MAX_HEIGHT, work[x][y]));
         }
     }
 
@@ -2320,6 +2686,15 @@ function draw2DGeneric(ctx, heightMap, houseMap, activeStroke) {
         }
         ctx.stroke();
     }
+
+    // 2D/3D共通の方向識別用：上=赤、右=青、下=緑、左=橙
+    const edgeWidth = 2;
+    ctx.lineWidth = edgeWidth;
+    ctx.lineCap = 'butt';
+    ctx.strokeStyle = '#ff4d4f'; ctx.beginPath(); ctx.moveTo(0, edgeWidth/2); ctx.lineTo(CANVAS_WIDTH, edgeWidth/2); ctx.stroke();
+    ctx.strokeStyle = '#409eff'; ctx.beginPath(); ctx.moveTo(CANVAS_WIDTH-edgeWidth/2, 0); ctx.lineTo(CANVAS_WIDTH-edgeWidth/2, CANVAS_HEIGHT); ctx.stroke();
+    ctx.strokeStyle = '#35c759'; ctx.beginPath(); ctx.moveTo(CANVAS_WIDTH, CANVAS_HEIGHT-edgeWidth/2); ctx.lineTo(0, CANVAS_HEIGHT-edgeWidth/2); ctx.stroke();
+    ctx.strokeStyle = '#ff9f0a'; ctx.beginPath(); ctx.moveTo(edgeWidth/2, CANVAS_HEIGHT); ctx.lineTo(edgeWidth/2, 0); ctx.stroke();
 }
 
 function handleEnd() {
@@ -2329,7 +2704,16 @@ function handleEnd() {
     lastAppliedCell = { x: -1, y: -1 };
 
     if (currentMode === 'drawContour' && currentStrokePoints.length >= 2) {
+        // 描画終了時に始点と終点を一致させて強制的に閉ループにする
+        const startPt = currentStrokePoints[0];
+        const lastPt = currentStrokePoints[currentStrokePoints.length - 1];
+        
+        if (startPt.x !== lastPt.x || startPt.y !== lastPt.y) {
+            currentStrokePoints.push({ x: startPt.x, y: startPt.y });
+        }
+
         applyContourLineToHeightMap(currentStrokePoints, currentSelectedHeight);
+
     }
     currentStrokePoints = [];
     draw2DMain();
@@ -2338,6 +2722,7 @@ function handleEnd() {
 function draw2DMain() {
     const activeStroke = (isDrawing && currentMode === 'drawContour') ? currentStrokePoints : null;
     draw2DGeneric(ctxMain, heightMapMain, houseMapMain, activeStroke);
+    refreshSubFromMainIfLinked();
 }
 
 function draw2DSub() {
@@ -2371,7 +2756,7 @@ function handleStart(clientX, clientY) {
     draw2DMain();
 }
 
-function handleMove(clientX, clientY) {
+function handleMove(clientX, clientY, showTouchIndicator = false) {
     if (!isDrawing || mainViewMode === '3D') return;
     const rect = canvas2dMain.getBoundingClientRect();
     const x = (clientX - rect.left) / canvasScaleFactor;
@@ -2379,6 +2764,12 @@ function handleMove(clientX, clientY) {
 
     const gx = Math.floor(x / CELL_SIZE);
     const gy = Math.floor(y / CELL_SIZE);
+
+    // 画面上に重ねる消しゴム表示はタッチ操作時だけ使用する。
+    // Windows等のマウス操作ではCSSの実カーソルだけを表示し、二重表示を防ぐ。
+    if (currentMode === 'erase' && showTouchIndicator) {
+        updateEraserTouchIndicator(clientX, clientY, true);
+    }
 
     if (currentMode === 'drawContour') {
         currentStrokePoints.push({ x, y });
@@ -2396,24 +2787,137 @@ function handleMove(clientX, clientY) {
     draw2DMain();
 }
 
-canvas2dMain.addEventListener('mousedown', (e) => handleStart(e.clientX, e.clientY));
-window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
-window.addEventListener('mouseup', handleEnd);
+
+// ===== 3D表示中の一部消しゴム =====
+// 3D地形とのレイ交差から格子位置を取得し、既存の消去処理を利用する。
+const eraserRaycaster3D = new THREE.Raycaster();
+const eraserPointer3D = new THREE.Vector2();
+
+function eraseAt3DPointer(clientX, clientY, beginStroke = false) {
+    if (mainViewMode !== '3D' || currentMode !== 'erase' || !cameraMain || !terrainMeshMain) return;
+    const rect = canvas3dMain.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    eraserPointer3D.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    eraserPointer3D.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    eraserRaycaster3D.setFromCamera(eraserPointer3D, cameraMain);
+    const hits = eraserRaycaster3D.intersectObject(terrainMeshMain, false);
+    if (!hits.length) return;
+    const point = hits[0].point;
+    // メッシュの平面座標は x,z ともに 0〜GRID_SIZE。
+    const gx = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(point.x)));
+    const gy = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(point.z)));
+    if (gx === last3DEraseCell.x && gy === last3DEraseCell.y) return;
+    if (beginStroke) saveHistory();
+    applyEraseBrush(gx, gy);
+    last3DEraseCell = { x: gx, y: gy };
+    sync2DTo3DMain();
+}
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mainViewMode === '3D' && currentMode === 'erase') {
+        cancel3DEraserMode();
+    }
+});
+
+canvas3dMain.addEventListener('mousedown', (e) => {
+    if (mainViewMode !== '3D' || currentMode !== 'erase' || e.button !== 0) return;
+    e.preventDefault();
+    is3DEraserDrawing = true;
+    last3DEraseCell = { x: -1, y: -1 };
+    eraseAt3DPointer(e.clientX, e.clientY, true);
+});
+window.addEventListener('mousemove', (e) => {
+    if (!is3DEraserDrawing) return;
+    eraseAt3DPointer(e.clientX, e.clientY, false);
+});
+window.addEventListener('mouseup', () => {
+    is3DEraserDrawing = false;
+    last3DEraseCell = { x: -1, y: -1 };
+});
+canvas3dMain.addEventListener('touchstart', (e) => {
+    if (mainViewMode !== '3D' || currentMode !== 'erase' || !e.touches.length) return;
+    e.preventDefault();
+    is3DEraserDrawing = true;
+    last3DEraseCell = { x: -1, y: -1 };
+    eraseAt3DPointer(e.touches[0].clientX, e.touches[0].clientY, true);
+}, { passive: false });
+canvas3dMain.addEventListener('touchmove', (e) => {
+    if (!is3DEraserDrawing || !e.touches.length) return;
+    e.preventDefault();
+    eraseAt3DPointer(e.touches[0].clientX, e.touches[0].clientY, false);
+}, { passive: false });
+window.addEventListener('touchend', () => {
+    is3DEraserDrawing = false;
+    last3DEraseCell = { x: -1, y: -1 };
+});
+
+canvas2dMain.addEventListener('mousedown', (e) => {
+    handleStart(e.clientX, e.clientY);
+    // マウス操作ではタッチ用の重ね表示を出さない。
+    updateEraserTouchIndicator(0, 0, false);
+});
+window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY, false));
+window.addEventListener('mouseup', () => {
+    handleEnd();
+    // マウスアップ時に画面上の消しゴム表示だけを消す。
+    // CSSのマウスカーソル（消しゴムアイコン）は消さない。
+    updateEraserTouchIndicator(0, 0, false);
+});
 
 canvas2dMain.addEventListener('touchstart', (e) => {
-    handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    const touch = e.touches[0];
+    handleStart(touch.clientX, touch.clientY);
+    updateEraserTouchIndicator(touch.clientX, touch.clientY, true);
     e.preventDefault();
 }, { passive: false });
 canvas2dMain.addEventListener('touchmove', (e) => {
-    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    handleMove(e.touches[0].clientX, e.touches[0].clientY, true);
     e.preventDefault();
 }, { passive: false });
-canvas2dMain.addEventListener('touchend', handleEnd);
+canvas2dMain.addEventListener('touchend', (e) => {
+    handleEnd();
+    updateEraserTouchIndicator(0, 0, false);
+});
+canvas2dMain.addEventListener('touchcancel', (e) => {
+    handleEnd();
+    updateEraserTouchIndicator(0, 0, false);
+});
 
+function updateGridSizeMenu() {
+    [40, 50, 60].forEach(size => {
+        const item = document.getElementById(`gridSize${size}`);
+        if (!item) return;
+        const mark = item.querySelector('.check-mark');
+        if (mark) mark.textContent = size === GRID_SIZE ? '✓' : '';
+    });
+}
+
+function setGridSize(size) {
+    if (![40, 50, 60].includes(Number(size)) || Number(size) === GRID_SIZE) return;
+    const hasTerrain = heightMapMain.some(row => row.some(v => Number(v) !== 0)) ||
+        heightMapSub.some(row => row.some(v => Number(v) !== 0)) ||
+        houseMapMain.some(row => row.some(Boolean)) || houseMapSub.some(row => row.some(Boolean)) ||
+        contourConstraintsMain.some(row => row.some(v => v !== null));
+    if (hasTerrain) {
+        const ok = window.confirm('キャンバスのマスの数を変更すると、作成途中の地形は初期化されます。');
+        if (!ok) return;
+    }
+    try { localStorage.setItem('terrainStudioGridSize', String(Number(size))); }
+    catch (_) { /* localStorage unavailable: apply for this reload only */ }
+    // すべての配列・2D描画・3Dメッシュを新しい格子数で初期化するため再読込する。
+    window.location.reload();
+}
+
+updateGridSizeMenu();
 init3D();
 initElevationLegend();
+setMode('raiseHill');
+updateEraserCursor();
 draw2DMain();
 adjustWorkspaceScale();
+
+// 初期状態とメニュー操作後の表示を同期
+updateDisplayToggleButtons();
 </script>
 
 </body>
